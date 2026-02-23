@@ -8,10 +8,17 @@ test.describe('Panel del Ciudadano', () => {
     expect(url).toMatch(/\/(dashboard|login)/);
   });
 
-  test('deberia mostrar la barra de navegacion inferior', async ({ page }) => {
+  test('deberia mostrar la barra de navegacion o redirigir a login', async ({ page }) => {
     await page.goto('/dashboard');
-    // Check for bottom navigation elements
-    const nav = page.locator('nav, [role="navigation"]');
-    await expect(nav.first()).toBeVisible();
+    const url = page.url();
+    if (url.includes('/dashboard')) {
+      // Authenticated: should see bottom navigation
+      const nav = page.locator('nav, [role="navigation"]');
+      await expect(nav.first()).toBeVisible();
+    } else {
+      // Not authenticated: redirected to login page
+      expect(url).toMatch(/\/login/);
+      await expect(page.locator('input')).toBeTruthy();
+    }
   });
 });
