@@ -1,0 +1,119 @@
+{
+  "id": "CO",
+  "name": "Colombia",
+  "fullName": "República de Colombia",
+  "flag": "🇨🇴",
+  "colors": {
+    "primary": "#FCD116",
+    "secondary": "#003893",
+    "accent": "#CE1126",
+    "background": "#FFFFFF",
+    "surface": "#F8F9FA",
+    "text": "#1A1A2E",
+    "textSecondary": "#6B7280"
+  },
+  "currency": "COP",
+  "locale": "es-CO",
+  "timezone": "America/Bogota",
+  "documents": {
+    "nationalId": {
+      "name": "Cédula de Ciudadanía",
+      "shortName": "CC",
+      "format": "XXXXXXXXXX",
+      "authority": "Registraduría Nacional del Estado Civil",
+      "icon": "id-card"
+    },
+    "foreignId": {
+      "name": "Cédula de Extranjería",
+      "shortName": "CE",
+      "format": "XXXXXXXXXX",
+      "authority": "Migración Colombia",
+      "icon": "id-card"
+    },
+    "passport": {
+      "name": "Pasaporte",
+      "format": "AAXXXXXXX",
+      "authority": "Cancillería",
+      "icon": "passport"
+    },
+    "driverLicense": {
+      "name": "Licencia de Conducción",
+      "format": "XXXXXXXXXX",
+      "authority": "Ministerio de Transporte",
+      "icon": "car"
+    },
+    "taxId": {
+      "name": "RUT",
+      "shortName": "NIT",
+      "format": "XXXXXXXXX-X",
+      "authority": "DIAN",
+      "icon": "file-text"
+    },
+    "healthCard": {
+      "name": "Carné de Afiliación EPS",
+      "authority": "ADRES / EPS",
+      "icon": "heart-pulse"
+    },
+    "childId": {
+      "name": "Tarjeta de Identidad",
+      "shortName": "TI",
+      "format": "XXXXXXXXXX",
+      "authority": "Registraduría Nacional",
+      "icon": "baby"
+    }
+  },
+  "agencies": {
+    "identity": {
+      "name": "Registraduría Nacional del Estado Civil",
+      "shortName": "RNEC",
+      "website": "https://www.registraduria.gov.co"
+    },
+    "vehicles": {
+      "name": "Registro Único Nacional de Tránsito",
+      "shortName": "RUNT",
+      "website": "https://www.runt.com.co"
+    },
+    "tax": {
+      "name": "Dirección de Impuestos y Aduanas Nacionales",
+      "shortName": "DIAN",
+      "website": "https://www.dian.gov.co"
+    },
+    "health": {
+      "name": "Administradora de los Recursos del SGSSS",
+      "shortName": "ADRES",
+      "website": "https://www.adres.gov.co"
+    },
+    "socialServices": {
+      "name": "Departamento para la Prosperidad Social",
+      "shortName": "DPS",
+      "website": "https://www.prosperidadsocial.gov.co"
+    },
+    "technology": {
+      "name": "Ministerio de TIC",
+      "shortName": "MinTIC",
+      "website": "https://www.mintic.gov.co"
+    }
+  },
+  "emergencyNumbers": {
+    "general": { "number": "123", "label": "Emergencias" },
+    "fire": { "number": "119", "label": "Bomberos" },
+    "ambulance": { "number": "125", "label": "Cruz Roja" },
+    "police": { "number": "112", "label": "Policía Nacional" },
+    "domesticViolence": { "number": "155", "label": "Violencia de Género" },
+    "childProtection": { "number": "141", "label": "ICBF Línea Niñez" },
+    "civilDefense": { "number": "144", "label": "Defensa Civil" },
+    "disasterRisk": { "number": "111", "label": "Gestión del Riesgo" }
+  },
+  "socialPrograms": [
+    { "id": "sisben", "name": "SISBEN IV", "authority": "DNP" },
+    { "id": "familias_accion", "name": "Familias en Acción", "authority": "DPS" },
+    { "id": "ingreso_solidario", "name": "Ingreso Solidario", "authority": "DPS" },
+    { "id": "jovenes_accion", "name": "Jóvenes en Acción", "authority": "DPS" },
+    { "id": "colombia_mayor", "name": "Colombia Mayor", "authority": "MinTrabajo" }
+  ],
+  "healthSystem": {
+    "regimes": ["Contributivo", "Subsidiado", "Especial"],
+    "mainEPS": ["Nueva EPS", "Sanitas", "Sura EPS", "Compensar", "Famisanar", "Salud Total", "Coomeva", "Mutual Ser"],
+    "vaccinationProgram": "PAI (Programa Ampliado de Inmunizaciones)"
+  }
+}

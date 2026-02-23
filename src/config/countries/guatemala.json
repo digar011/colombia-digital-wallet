@@ -1,0 +1,119 @@
+{
+  "id": "GT",
+  "name": "Guatemala",
+  "fullName": "República de Guatemala",
+  "flag": "🇬🇹",
+  "colors": {
+    "primary": "#4997D0",
+    "secondary": "#FFFFFF",
+    "accent": "#4997D0",
+    "background": "#FFFFFF",
+    "surface": "#F0F5FA",
+    "text": "#1A1A2E",
+    "textSecondary": "#6B7280"
+  },
+  "currency": "GTQ",
+  "locale": "es-GT",
+  "timezone": "America/Guatemala",
+  "documents": {
+    "nationalId": {
+      "name": "Documento Personal de Identificación",
+      "shortName": "DPI",
+      "format": "XXXX XXXXX XXXX",
+      "authority": "RENAP",
+      "icon": "id-card"
+    },
+    "foreignId": {
+      "name": "Documento de Identificación de Extranjero",
+      "shortName": "DIE",
+      "format": "XXXXXXXXXXXX",
+      "authority": "Instituto Guatemalteco de Migración",
+      "icon": "id-card"
+    },
+    "passport": {
+      "name": "Pasaporte",
+      "format": "AAXXXXXXX",
+      "authority": "Instituto Guatemalteco de Migración",
+      "icon": "passport"
+    },
+    "driverLicense": {
+      "name": "Licencia de Conducir",
+      "format": "XXXXXXXXXXXX",
+      "authority": "Departamento de Tránsito",
+      "icon": "car"
+    },
+    "taxId": {
+      "name": "Número de Identificación Tributaria",
+      "shortName": "NIT",
+      "format": "XXXXXXX-X",
+      "authority": "SAT",
+      "icon": "file-text"
+    },
+    "healthCard": {
+      "name": "Carné del IGSS",
+      "authority": "IGSS",
+      "icon": "heart-pulse"
+    },
+    "childId": {
+      "name": "Certificado de Nacimiento",
+      "shortName": "CN",
+      "format": "N/A",
+      "authority": "RENAP",
+      "icon": "baby"
+    }
+  },
+  "agencies": {
+    "identity": {
+      "name": "Registro Nacional de las Personas",
+      "shortName": "RENAP",
+      "website": "https://www.renap.gob.gt"
+    },
+    "vehicles": {
+      "name": "Superintendencia de Administración Tributaria (Registro de Vehículos)",
+      "shortName": "SAT-Vehículos",
+      "website": "https://portal.sat.gob.gt"
+    },
+    "tax": {
+      "name": "Superintendencia de Administración Tributaria",
+      "shortName": "SAT",
+      "website": "https://portal.sat.gob.gt"
+    },
+    "health": {
+      "name": "Instituto Guatemalteco de Seguridad Social",
+      "shortName": "IGSS",
+      "website": "https://www.igssgt.org"
+    },
+    "socialServices": {
+      "name": "Ministerio de Desarrollo Social",
+      "shortName": "MIDES",
+      "website": "https://www.mides.gob.gt"
+    },
+    "technology": {
+      "name": "Ministerio de Comunicaciones, Infraestructura y Vivienda",
+      "shortName": "CIV",
+      "website": "https://www.civ.gob.gt"
+    }
+  },
+  "emergencyNumbers": {
+    "general": { "number": "110", "label": "Policía Nacional Civil" },
+    "fire": { "number": "122", "label": "Bomberos Voluntarios" },
+    "ambulance": { "number": "128", "label": "Bomberos Municipales / Cruz Roja" },
+    "police": { "number": "110", "label": "Policía Nacional Civil (PNC)" },
+    "domesticViolence": { "number": "1572", "label": "Violencia contra la Mujer" },
+    "childProtection": { "number": "1546", "label": "PGN Línea de Niñez" },
+    "civilDefense": { "number": "119", "label": "CONRED" },
+    "disasterRisk": { "number": "119", "label": "CONRED Desastres" }
+  },
+  "socialPrograms": [
+    { "id": "bono_social", "name": "Bono Social", "authority": "MIDES" },
+    { "id": "bolsa_social", "name": "Bolsa Social", "authority": "MIDES" },
+    { "id": "beca_social", "name": "Beca Social", "authority": "MIDES" },
+    { "id": "comedor_social", "name": "Comedores Sociales", "authority": "MIDES" },
+    { "id": "adulto_mayor", "name": "Programa Adulto Mayor", "authority": "MIDES" }
+  ],
+  "healthSystem": {
+    "regimes": ["IGSS (Afiliados)", "Red Pública (MSPAS)", "Privado"],
+    "mainEPS": ["IGSS", "MSPAS (Ministerio de Salud Pública)", "Sanatorios Privados"],
+    "vaccinationProgram": "PNV (Programa Nacional de Vacunación)"
+  }
+}

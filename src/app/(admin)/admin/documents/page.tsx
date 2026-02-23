@@ -1,0 +1,884 @@
+'use client';
+
+import { useState, useEffect, useMemo } from 'react';
+import {
+  Search,
+  FileText,
+  FilePlus,
+  FileCheck,
+  FileX,
+  Filter,
+  Download,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  MoreHorizontal,
+  Eye,
+  Ban,
+  RotateCcw,
+  X,
+  Send,
+  CheckCircle2,
+  Clock,
+  Copy,
+  Layers,
+  Settings2,
+} from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardBody, CardDescription, CardFooter } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import {
+  mockIssuedDocuments,
+  mockDocumentTemplates,
+  mockCitizens,
+  formatDate,
+  formatRelativeTime,
+  getStatusBadgeVariant,
+  getDocumentTypeLabel,
+  type DocumentType,
+} from '@/lib/mock/adminData';
+
+// ─── Tab for this page ───────────────────────────────────────────────────────
+
+type PageTab = 'queue' | 'issued' | 'templates';
+
+// ─── Main Page ───────────────────────────────────────────────────────────────
+
+export default function AdminDocumentsPage() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<PageTab>('queue');
+
+  // Issue form state
+  const [showIssueForm, setShowIssueForm] = useState(false);
+  const [issueFormData, setIssueFormData] = useState({
+    citizenId: '',
+    documentType: '' as DocumentType | '',
+    notes: '',
+  });
+
+  // Search & filters
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [typeFilter, setTypeFilter] = useState<string>('');
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
+  // Row action menu
+  const [activeRowMenu, setActiveRowMenu] = useState<string | null>(null);
+
+  // Batch selection
+  const [selectedDocIds, setSelectedDocIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // ── Filtered documents ────────────────────────────────────────
+
+  const filteredDocs = useMemo(() => {
+    let docs = [...mockIssuedDocuments];
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      docs = docs.filter(
+        (d) =>
+          d.citizenName.toLowerCase().includes(q) ||
+          d.documentNumber.toLowerCase().includes(q)
+      );
+    }
+
+    if (statusFilter) {
+      docs = docs.filter((d) => d.status === statusFilter);
+    }
+
+    if (typeFilter) {
+      docs = docs.filter((d) => d.type === typeFilter);
+    }
+
+    // Sort: most recent first
+    docs.sort(
+      (a, b) => new Date(b.issuedAt).getTime() - new Date(a.issuedAt).getTime()
+    );
+
+    return docs;
+  }, [searchQuery, statusFilter, typeFilter]);
+
+  const pendingDocs = mockIssuedDocuments.filter((d) => d.status === 'pending');
+  const totalPages = Math.max(1, Math.ceil(filteredDocs.length / pageSize));
+  const paginatedDocs = filteredDocs.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter, typeFilter]);
+
+  const hasFilters = statusFilter || typeFilter;
+
+  // ── Document stats ────────────────────────────────────────────
+
+  const docStats = useMemo(() => {
+    const total = mockIssuedDocuments.length;
+    const active = mockIssuedDocuments.filter((d) => d.status === 'active').length;
+    const pending = mockIssuedDocuments.filter((d) => d.status === 'pending').length;
+    const revoked = mockIssuedDocuments.filter((d) => d.status === 'revoked').length;
+    return { total, active, pending, revoked };
+  }, []);
+
+  // ── Loading ───────────────────────────────────────────────────
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          <div className="h-8 w-56 bg-gray-200 rounded animate-pulse" />
+          <div className="grid grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-xl shadow-md h-24 animate-pulse" />
+            ))}
+          </div>
+          <div className="bg-white rounded-xl shadow-md h-96 animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* ── Header ──────────────────────────────────────────── */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-text-primary">Document Management</h1>
+            <p className="text-sm text-text-secondary mt-1">
+              Issue, manage, and revoke citizen documents
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" leftIcon={Download}>
+              Export
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={FilePlus}
+              onClick={() => setShowIssueForm(true)}
+            >
+              Issue Document
+            </Button>
+          </div>
+        </div>
+
+        {/* ── Stats Cards ─────────────────────────────────────── */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card variant="outlined" padding="md">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-blue-100">
+                <FileText className="w-5 h-5 text-blue-700" />
+              </div>
+              <div>
+                <p className="text-xs text-text-secondary">Total Issued</p>
+                <p className="text-xl font-bold text-text-primary">{docStats.total}</p>
+              </div>
+            </div>
+          </Card>
+          <Card variant="outlined" padding="md">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-green-100">
+                <FileCheck className="w-5 h-5 text-green-700" />
+              </div>
+              <div>
+                <p className="text-xs text-text-secondary">Active</p>
+                <p className="text-xl font-bold text-green-600">{docStats.active}</p>
+              </div>
+            </div>
+          </Card>
+          <Card variant="outlined" padding="md">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-yellow-100">
+                <Clock className="w-5 h-5 text-yellow-700" />
+              </div>
+              <div>
+                <p className="text-xs text-text-secondary">Pending</p>
+                <p className="text-xl font-bold text-yellow-600">{docStats.pending}</p>
+              </div>
+            </div>
+          </Card>
+          <Card variant="outlined" padding="md">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-red-100">
+                <FileX className="w-5 h-5 text-red-700" />
+              </div>
+              <div>
+                <p className="text-xs text-text-secondary">Revoked</p>
+                <p className="text-xl font-bold text-red-600">{docStats.revoked}</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* ── Issue Document Form (Modal-like) ────────────────── */}
+        {showIssueForm && (
+          <Card variant="elevated" className="border-2 border-colombia-blue/20">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Issue New Document</CardTitle>
+                  <CardDescription>Fill in the details to issue a new document</CardDescription>
+                </div>
+                <button
+                  onClick={() => setShowIssueForm(false)}
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </CardHeader>
+            <CardBody>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Citizen selector */}
+                <div>
+                  <label className="block text-sm font-medium text-text-primary mb-1.5">
+                    Citizen <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={issueFormData.citizenId}
+                      onChange={(e) =>
+                        setIssueFormData({ ...issueFormData, citizenId: e.target.value })
+                      }
+                      className="w-full h-10 px-3 pr-8 rounded-lg border border-gray-200 bg-white text-sm text-text-primary appearance-none focus:outline-none focus:ring-2 focus:ring-colombia-blue/30 focus:border-colombia-blue"
+                    >
+                      <option value="">Select a citizen...</option>
+                      {mockCitizens
+                        .filter((c) => c.status === 'verified')
+                        .map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.firstName} {c.lastName} - {c.documentNumber}
+                          </option>
+                        ))}
+                    </select>
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Document type selector */}
+                <div>
+                  <label className="block text-sm font-medium text-text-primary mb-1.5">
+                    Document Type <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={issueFormData.documentType}
+                      onChange={(e) =>
+                        setIssueFormData({
+                          ...issueFormData,
+                          documentType: e.target.value as DocumentType,
+                        })
+                      }
+                      className="w-full h-10 px-3 pr-8 rounded-lg border border-gray-200 bg-white text-sm text-text-primary appearance-none focus:outline-none focus:ring-2 focus:ring-colombia-blue/30 focus:border-colombia-blue"
+                    >
+                      <option value="">Select type...</option>
+                      {mockDocumentTemplates
+                        .filter((t) => t.active)
+                        .map((t) => (
+                          <option key={t.id} value={t.type}>
+                            {t.name} (v{t.version})
+                          </option>
+                        ))}
+                    </select>
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-text-primary mb-1.5">
+                    Notes (optional)
+                  </label>
+                  <textarea
+                    value={issueFormData.notes}
+                    onChange={(e) =>
+                      setIssueFormData({ ...issueFormData, notes: e.target.value })
+                    }
+                    placeholder="Additional notes for this issuance..."
+                    rows={3}
+                    className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:ring-2 focus:ring-colombia-blue/30 focus:border-colombia-blue resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Template preview */}
+              {issueFormData.documentType && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Eye className="w-4 h-4 text-text-secondary" />
+                    <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                      Template Preview
+                    </span>
+                  </div>
+                  {(() => {
+                    const tmpl = mockDocumentTemplates.find(
+                      (t) => t.type === issueFormData.documentType
+                    );
+                    if (!tmpl) return null;
+                    return (
+                      <div className="grid grid-cols-3 gap-3 text-sm">
+                        <div>
+                          <p className="text-xs text-text-secondary">Template</p>
+                          <p className="font-medium text-text-primary">{tmpl.name}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-text-secondary">Version</p>
+                          <p className="font-medium text-text-primary">v{tmpl.version}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-text-secondary">Fields</p>
+                          <p className="font-medium text-text-primary">{tmpl.fieldsCount}</p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                  {/* Visual preview placeholder */}
+                  <div className="mt-3 h-32 bg-white rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                    <div className="text-center">
+                      <FileText className="w-8 h-8 text-gray-300 mx-auto mb-1" />
+                      <p className="text-xs text-text-secondary">Document preview will render here</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardBody>
+            <CardFooter>
+              <div className="flex items-center gap-2 ml-auto">
+                <Button variant="ghost" size="sm" onClick={() => setShowIssueForm(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  leftIcon={Send}
+                  disabled={!issueFormData.citizenId || !issueFormData.documentType}
+                >
+                  Issue Document
+                </Button>
+              </div>
+            </CardFooter>
+          </Card>
+        )}
+
+        {/* ── Tab Navigation ──────────────────────────────────── */}
+        <div className="border-b border-gray-200">
+          <nav className="flex gap-0 -mb-px">
+            {(
+              [
+                { id: 'queue' as PageTab, label: 'Issuance Queue', count: pendingDocs.length },
+                { id: 'issued' as PageTab, label: 'All Documents', count: mockIssuedDocuments.length },
+                { id: 'templates' as PageTab, label: 'Templates', count: mockDocumentTemplates.length },
+              ] as const
+            ).map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-5 py-3 border-b-2 text-sm font-medium transition-colors ${
+                  activeTab === tab.id
+                    ? 'border-colombia-blue text-colombia-blue'
+                    : 'border-transparent text-text-secondary hover:text-text-primary hover:border-gray-300'
+                }`}
+              >
+                {tab.label}
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    activeTab === tab.id
+                      ? 'bg-colombia-blue/10 text-colombia-blue'
+                      : 'bg-gray-100 text-text-secondary'
+                  }`}
+                >
+                  {tab.count}
+                </span>
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        {/* ── Queue Tab ───────────────────────────────────────── */}
+        {activeTab === 'queue' && (
+          <Card variant="elevated">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Pending Issuance Queue</CardTitle>
+                  <CardDescription>
+                    Documents awaiting approval and issuance
+                  </CardDescription>
+                </div>
+                <Button variant="primary" size="sm" leftIcon={CheckCircle2}>
+                  Approve All
+                </Button>
+              </div>
+            </CardHeader>
+            <CardBody className="!p-0">
+              {pendingDocs.length === 0 ? (
+                <div className="px-6 py-12 text-center">
+                  <CheckCircle2 className="w-12 h-12 text-green-300 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-text-secondary">Queue is empty</p>
+                  <p className="text-xs text-text-secondary mt-1">
+                    All documents have been processed
+                  </p>
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-100">
+                  {pendingDocs.map((doc) => (
+                    <div
+                      key={doc.id}
+                      className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="p-2.5 rounded-xl bg-yellow-100 text-yellow-700 flex-shrink-0">
+                        <Clock className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-text-primary">
+                            {getDocumentTypeLabel(doc.type)}
+                          </p>
+                          <Badge status="pending" size="sm" dot>
+                            Pendiente
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-text-secondary mt-0.5">
+                          {doc.citizenName} &middot; {doc.documentNumber}
+                        </p>
+                        <p className="text-xs text-text-secondary">
+                          Requested {formatRelativeTime(doc.issuedAt)} &middot; By {doc.issuedBy}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Button variant="primary" size="sm" leftIcon={CheckCircle2}>
+                          Approve
+                        </Button>
+                        <Button variant="outline" size="sm" leftIcon={Ban}>
+                          Reject
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardBody>
+          </Card>
+        )}
+
+        {/* ── Issued Documents Tab ────────────────────────────── */}
+        {activeTab === 'issued' && (
+          <>
+            {/* Search + Filter */}
+            <Card variant="elevated">
+              <CardBody>
+                <div className="flex flex-col md:flex-row gap-3">
+                  <div className="flex-1">
+                    <Input
+                      placeholder="Search by citizen name or document number..."
+                      leftIcon={Search}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant={showFilters ? 'primary' : 'outline'}
+                      size="md"
+                      leftIcon={Filter}
+                      onClick={() => setShowFilters(!showFilters)}
+                    >
+                      Filters
+                    </Button>
+                    {hasFilters && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        leftIcon={X}
+                        onClick={() => {
+                          setStatusFilter('');
+                          setTypeFilter('');
+                        }}
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {showFilters && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 pt-4 border-t border-gray-100">
+                    <div>
+                      <label className="block text-xs font-medium text-text-secondary mb-1.5">
+                        Status
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={statusFilter}
+                          onChange={(e) => setStatusFilter(e.target.value)}
+                          className="w-full h-10 px-3 pr-8 rounded-lg border border-gray-200 bg-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-colombia-blue/30"
+                        >
+                          <option value="">All statuses</option>
+                          <option value="active">Active</option>
+                          <option value="pending">Pending</option>
+                          <option value="revoked">Revoked</option>
+                          <option value="expired">Expired</option>
+                        </select>
+                        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-text-secondary mb-1.5">
+                        Document Type
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={typeFilter}
+                          onChange={(e) => setTypeFilter(e.target.value)}
+                          className="w-full h-10 px-3 pr-8 rounded-lg border border-gray-200 bg-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-colombia-blue/30"
+                        >
+                          <option value="">All types</option>
+                          <option value="cedula">Cedula de Ciudadania</option>
+                          <option value="passport">Pasaporte</option>
+                          <option value="license">Licencia de Conduccion</option>
+                          <option value="health_card">Carne de Salud</option>
+                          <option value="military_id">Libreta Militar</option>
+                          <option value="electoral">Tarjeta Electoral</option>
+                        </select>
+                        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardBody>
+            </Card>
+
+            {/* Batch actions bar */}
+            {selectedDocIds.size > 0 && (
+              <div className="flex items-center gap-3 bg-colombia-blue text-white px-4 py-3 rounded-xl">
+                <span className="text-sm font-medium">
+                  {selectedDocIds.size} document{selectedDocIds.size !== 1 ? 's' : ''} selected
+                </span>
+                <div className="flex items-center gap-2 ml-auto">
+                  <Button variant="ghost" size="sm" className="!text-white hover:!bg-white/20" leftIcon={Ban}>
+                    Revoke Selected
+                  </Button>
+                  <Button variant="ghost" size="sm" className="!text-white hover:!bg-white/20" leftIcon={Download}>
+                    Export Selected
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="!text-white hover:!bg-white/20"
+                    onClick={() => setSelectedDocIds(new Set())}
+                  >
+                    Clear
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Documents Table */}
+            <Card variant="elevated" className="overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200 bg-gray-50">
+                      <th className="w-12 px-4 py-3">
+                        <input
+                          type="checkbox"
+                          checked={
+                            paginatedDocs.length > 0 &&
+                            selectedDocIds.size === paginatedDocs.length
+                          }
+                          onChange={() => {
+                            if (selectedDocIds.size === paginatedDocs.length) {
+                              setSelectedDocIds(new Set());
+                            } else {
+                              setSelectedDocIds(new Set(paginatedDocs.map((d) => d.id)));
+                            }
+                          }}
+                          className="w-4 h-4 rounded border-gray-300"
+                        />
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                        Document
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                        Citizen
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider hidden md:table-cell">
+                        Issued
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider hidden lg:table-cell">
+                        Expires
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider hidden lg:table-cell">
+                        Issued By
+                      </th>
+                      <th className="w-12 px-4 py-3" />
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {paginatedDocs.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="px-4 py-12 text-center">
+                          <FileText className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                          <p className="text-sm font-medium text-text-secondary">
+                            No documents found
+                          </p>
+                        </td>
+                      </tr>
+                    ) : (
+                      paginatedDocs.map((doc) => (
+                        <tr key={doc.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-4 py-3">
+                            <input
+                              type="checkbox"
+                              checked={selectedDocIds.has(doc.id)}
+                              onChange={() => {
+                                setSelectedDocIds((prev) => {
+                                  const next = new Set(prev);
+                                  if (next.has(doc.id)) next.delete(doc.id);
+                                  else next.add(doc.id);
+                                  return next;
+                                });
+                              }}
+                              className="w-4 h-4 rounded border-gray-300"
+                            />
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={`p-2 rounded-lg flex-shrink-0 ${
+                                  doc.status === 'active'
+                                    ? 'bg-green-100 text-green-700'
+                                    : doc.status === 'pending'
+                                    ? 'bg-yellow-100 text-yellow-700'
+                                    : 'bg-red-100 text-red-700'
+                                }`}
+                              >
+                                <FileText className="w-4 h-4" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm font-semibold text-text-primary truncate">
+                                  {getDocumentTypeLabel(doc.type)}
+                                </p>
+                                <p className="text-xs text-text-secondary font-mono">
+                                  {doc.documentNumber}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <p className="text-sm text-text-primary">{doc.citizenName}</p>
+                          </td>
+                          <td className="px-4 py-3">
+                            <Badge status={getStatusBadgeVariant(doc.status)} dot size="sm">
+                              {doc.status === 'active'
+                                ? 'Activo'
+                                : doc.status === 'pending'
+                                ? 'Pendiente'
+                                : doc.status === 'revoked'
+                                ? 'Revocado'
+                                : 'Expirado'}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-3 hidden md:table-cell">
+                            <p className="text-sm text-text-secondary">
+                              {formatDate(doc.issuedAt)}
+                            </p>
+                          </td>
+                          <td className="px-4 py-3 hidden lg:table-cell">
+                            <p className="text-sm text-text-secondary">
+                              {formatDate(doc.expiresAt)}
+                            </p>
+                          </td>
+                          <td className="px-4 py-3 hidden lg:table-cell">
+                            <p className="text-xs text-text-secondary">{doc.issuedBy}</p>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="relative">
+                              <button
+                                onClick={() =>
+                                  setActiveRowMenu(
+                                    activeRowMenu === doc.id ? null : doc.id
+                                  )
+                                }
+                                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                              >
+                                <MoreHorizontal className="w-4 h-4 text-gray-500" />
+                              </button>
+                              {activeRowMenu === doc.id && (
+                                <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+                                  <button className="w-full px-3 py-2 text-left text-sm text-text-primary hover:bg-gray-50 flex items-center gap-2">
+                                    <Eye className="w-4 h-4" /> View Details
+                                  </button>
+                                  <button className="w-full px-3 py-2 text-left text-sm text-text-primary hover:bg-gray-50 flex items-center gap-2">
+                                    <Copy className="w-4 h-4" /> Copy Number
+                                  </button>
+                                  <button className="w-full px-3 py-2 text-left text-sm text-text-primary hover:bg-gray-50 flex items-center gap-2">
+                                    <Download className="w-4 h-4" /> Download
+                                  </button>
+                                  {doc.status === 'active' && (
+                                    <>
+                                      <div className="border-t border-gray-100 my-1" />
+                                      <button className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                        <Ban className="w-4 h-4" /> Revoke
+                                      </button>
+                                    </>
+                                  )}
+                                  {doc.status === 'revoked' && (
+                                    <>
+                                      <div className="border-t border-gray-100 my-1" />
+                                      <button className="w-full px-3 py-2 text-left text-sm text-green-600 hover:bg-green-50 flex items-center gap-2">
+                                        <RotateCcw className="w-4 h-4" /> Reinstate
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              {filteredDocs.length > 0 && (
+                <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50/50">
+                  <p className="text-sm text-text-secondary">
+                    Showing {(currentPage - 1) * pageSize + 1}
+                    {' '}-{' '}
+                    {Math.min(currentPage * pageSize, filteredDocs.length)} of{' '}
+                    {filteredDocs.length}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:pointer-events-none"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-8 h-8 rounded-lg text-sm font-medium ${
+                          currentPage === page
+                            ? 'bg-colombia-blue text-white'
+                            : 'hover:bg-gray-100 text-text-secondary'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:pointer-events-none"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </Card>
+          </>
+        )}
+
+        {/* ── Templates Tab ───────────────────────────────────── */}
+        {activeTab === 'templates' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {mockDocumentTemplates.map((tmpl) => (
+              <Card key={tmpl.id} variant="elevated" className="relative">
+                {!tmpl.active && (
+                  <div className="absolute top-3 right-3">
+                    <Badge status="default" size="sm">
+                      Inactive
+                    </Badge>
+                  </div>
+                )}
+                <CardBody>
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`p-3 rounded-xl flex-shrink-0 ${
+                        tmpl.active
+                          ? 'bg-colombia-blue/10 text-colombia-blue'
+                          : 'bg-gray-100 text-gray-400'
+                      }`}
+                    >
+                      <Layers className="w-6 h-6" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-text-primary">{tmpl.name}</p>
+                      <p className="text-xs text-text-secondary mt-0.5">
+                        Version {tmpl.version}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                      <p className="text-text-secondary">Fields</p>
+                      <p className="font-semibold text-text-primary">{tmpl.fieldsCount}</p>
+                    </div>
+                    <div>
+                      <p className="text-text-secondary">Last Updated</p>
+                      <p className="font-semibold text-text-primary">
+                        {formatRelativeTime(tmpl.lastUpdated)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Visual template preview */}
+                  <div className="mt-4 h-24 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-5">
+                      <div className="w-full h-full" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 8px, #003893 8px, #003893 9px), repeating-linear-gradient(90deg, transparent, transparent 8px, #003893 8px, #003893 9px)' }} />
+                    </div>
+                    <div className="text-center z-10">
+                      <FileText className="w-6 h-6 text-gray-400 mx-auto" />
+                      <p className="text-[10px] text-text-secondary mt-1">{tmpl.name}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex items-center gap-2">
+                    <Button variant="outline" size="sm" fullWidth leftIcon={Eye}>
+                      Preview
+                    </Button>
+                    <Button variant="ghost" size="sm" fullWidth leftIcon={Settings2}>
+                      Edit
+                    </Button>
+                  </div>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Click-outside handler */}
+      {activeRowMenu && (
+        <div
+          className="fixed inset-0 z-10"
+          onClick={() => setActiveRowMenu(null)}
+        />
+      )}
+    </div>
+  );
+}

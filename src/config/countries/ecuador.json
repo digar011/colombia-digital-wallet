@@ -1,0 +1,119 @@
+{
+  "id": "EC",
+  "name": "Ecuador",
+  "fullName": "República del Ecuador",
+  "flag": "🇪🇨",
+  "colors": {
+    "primary": "#FFD100",
+    "secondary": "#034EA2",
+    "accent": "#ED1C24",
+    "background": "#FFFFFF",
+    "surface": "#F8F9FA",
+    "text": "#1A1A2E",
+    "textSecondary": "#6B7280"
+  },
+  "currency": "USD",
+  "locale": "es-EC",
+  "timezone": "America/Guayaquil",
+  "documents": {
+    "nationalId": {
+      "name": "Cédula de Identidad",
+      "shortName": "CI",
+      "format": "XXXXXXXXXX",
+      "authority": "Registro Civil",
+      "icon": "id-card"
+    },
+    "foreignId": {
+      "name": "Cédula de Identidad para Extranjeros",
+      "shortName": "CIE",
+      "format": "XXXXXXXXXX",
+      "authority": "Registro Civil",
+      "icon": "id-card"
+    },
+    "passport": {
+      "name": "Pasaporte",
+      "format": "AAXXXXXXX",
+      "authority": "Ministerio de Relaciones Exteriores",
+      "icon": "passport"
+    },
+    "driverLicense": {
+      "name": "Licencia de Conducir",
+      "format": "XXXXXXXXXX",
+      "authority": "Agencia Nacional de Tránsito",
+      "icon": "car"
+    },
+    "taxId": {
+      "name": "Registro Único de Contribuyentes",
+      "shortName": "RUC",
+      "format": "XXXXXXXXXXXXX",
+      "authority": "SRI",
+      "icon": "file-text"
+    },
+    "healthCard": {
+      "name": "Carné del IESS",
+      "authority": "IESS",
+      "icon": "heart-pulse"
+    },
+    "childId": {
+      "name": "Cédula de Identidad (Menores)",
+      "shortName": "CI",
+      "format": "XXXXXXXXXX",
+      "authority": "Registro Civil",
+      "icon": "baby"
+    }
+  },
+  "agencies": {
+    "identity": {
+      "name": "Dirección General de Registro Civil, Identificación y Cedulación",
+      "shortName": "Registro Civil",
+      "website": "https://www.registrocivil.gob.ec"
+    },
+    "vehicles": {
+      "name": "Agencia Nacional de Tránsito",
+      "shortName": "ANT",
+      "website": "https://www.ant.gob.ec"
+    },
+    "tax": {
+      "name": "Servicio de Rentas Internas",
+      "shortName": "SRI",
+      "website": "https://www.sri.gob.ec"
+    },
+    "health": {
+      "name": "Instituto Ecuatoriano de Seguridad Social",
+      "shortName": "IESS",
+      "website": "https://www.iess.gob.ec"
+    },
+    "socialServices": {
+      "name": "Ministerio de Inclusión Económica y Social",
+      "shortName": "MIES",
+      "website": "https://www.inclusion.gob.ec"
+    },
+    "technology": {
+      "name": "Ministerio de Telecomunicaciones y de la Sociedad de la Información",
+      "shortName": "MINTEL",
+      "website": "https://www.telecomunicaciones.gob.ec"
+    }
+  },
+  "emergencyNumbers": {
+    "general": { "number": "911", "label": "Emergencias (ECU 911)" },
+    "fire": { "number": "131", "label": "Bomberos" },
+    "ambulance": { "number": "911", "label": "Ambulancia (ECU 911)" },
+    "police": { "number": "102", "label": "Policía Nacional" },
+    "domesticViolence": { "number": "1800-000-368", "label": "Violencia de Género" },
+    "childProtection": { "number": "1800-111-000", "label": "DINAPEN Niñez" },
+    "civilDefense": { "number": "911", "label": "Gestión de Riesgos" },
+    "disasterRisk": { "number": "911", "label": "SNGRE" }
+  },
+  "socialPrograms": [
+    { "id": "registro_social", "name": "Registro Social", "authority": "MIES" },
+    { "id": "bono_desarrollo", "name": "Bono de Desarrollo Humano", "authority": "MIES" },
+    { "id": "pension_adultos", "name": "Pensión Mis Mejores Años", "authority": "MIES" },
+    { "id": "bono_joaquin_gallegos", "name": "Bono Joaquín Gallegos Lara", "authority": "MIES" },
+    { "id": "credito_desarrollo", "name": "Crédito de Desarrollo Humano", "authority": "MIES" }
+  ],
+  "healthSystem": {
+    "regimes": ["Seguro General Obligatorio", "Seguro Social Campesino", "Seguro Voluntario"],
+    "mainEPS": ["IESS", "ISSFA", "ISSPOL", "MSP (Red Pública)"],
+    "vaccinationProgram": "PAI (Programa Ampliado de Inmunizaciones)"
+  }
+}
