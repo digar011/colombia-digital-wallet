@@ -20,11 +20,16 @@ import type { CountryId } from '@/config';
 
 // ─── Validation helpers ─────────────────────────────────────────────────────
 
+// Known test account usernames that bypass email/phone validation
+const TEST_USERNAMES = ['admin123'];
+
 function validateEmailOrPhone(value: string): string | null {
   if (!value.trim()) return 'Este campo es requerido';
+  // Allow test account usernames
+  if (TEST_USERNAMES.includes(value.trim())) return null;
   const isEmail = value.includes('@');
   const isPhone = /^\+?\d{7,15}$/.test(value.replace(/\s/g, ''));
-  if (!isEmail && !isPhone) return 'Ingresa un correo o numero de telefono valido';
+  if (!isEmail && !isPhone) return 'Ingresa un correo, telefono o usuario valido';
   if (isEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'El formato del correo no es valido';
   return null;
 }

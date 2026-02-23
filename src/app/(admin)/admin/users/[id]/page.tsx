@@ -59,11 +59,11 @@ interface Tab {
 }
 
 const TABS: Tab[] = [
-  { id: 'documents', label: 'Documents', icon: <FileText className="w-4 h-4" /> },
-  { id: 'vehicles', label: 'Vehicles', icon: <Car className="w-4 h-4" /> },
-  { id: 'health', label: 'Health', icon: <Heart className="w-4 h-4" /> },
-  { id: 'services', label: 'Services', icon: <Briefcase className="w-4 h-4" /> },
-  { id: 'activity', label: 'Activity', icon: <Activity className="w-4 h-4" /> },
+  { id: 'documents', label: 'Documentos', icon: <FileText className="w-4 h-4" /> },
+  { id: 'vehicles', label: 'Vehículos', icon: <Car className="w-4 h-4" /> },
+  { id: 'health', label: 'Salud', icon: <Heart className="w-4 h-4" /> },
+  { id: 'services', label: 'Servicios', icon: <Briefcase className="w-4 h-4" /> },
+  { id: 'activity', label: 'Actividad', icon: <Activity className="w-4 h-4" /> },
 ];
 
 // ─── Mock vehicle data ───────────────────────────────────────────────────────
@@ -152,13 +152,13 @@ const mockNotes = [
   {
     id: 'note-001',
     author: 'admin@wallet.gov.co',
-    content: 'Citizen requested address update. Documentation verified and approved.',
+    content: 'Ciudadano solicitó actualización de dirección. Documentación verificada y aprobada.',
     createdAt: '2026-02-18T14:30:00Z',
   },
   {
     id: 'note-002',
     author: 'supervisor@wallet.gov.co',
-    content: 'Biometric data refreshed during in-person visit at Bogota office.',
+    content: 'Datos biométricos actualizados durante visita presencial en oficina de Bogotá.',
     createdAt: '2026-02-10T09:15:00Z',
   },
 ];
@@ -246,12 +246,12 @@ export default function AdminUserDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center space-y-4">
           <XCircle className="w-16 h-16 text-gray-300 mx-auto" />
-          <h2 className="text-xl font-bold text-text-primary">Citizen Not Found</h2>
+          <h2 className="text-xl font-bold text-text-primary">Ciudadano No Encontrado</h2>
           <p className="text-sm text-text-secondary">
-            The citizen with ID &quot;{citizenId}&quot; could not be found.
+            No se pudo encontrar el ciudadano con ID &quot;{citizenId}&quot;.
           </p>
           <Button variant="primary" onClick={() => router.push('/admin/users')}>
-            Back to Citizens
+            Volver a Ciudadanos
           </Button>
         </div>
       </div>
@@ -269,7 +269,7 @@ export default function AdminUserDetailPage() {
           className="flex items-center gap-1.5 text-sm text-text-secondary hover:text-colombia-blue transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Citizens
+          Volver a Ciudadanos
         </button>
 
         {/* ── Profile Header ──────────────────────────────────── */}
@@ -323,7 +323,7 @@ export default function AdminUserDetailPage() {
                   </div>
                   <div className="flex items-center gap-2 text-sm text-text-secondary">
                     <Clock className="w-4 h-4 flex-shrink-0" />
-                    <span>Registered {formatRelativeTime(citizen.registeredAt)}</span>
+                    <span>Registrado {formatRelativeTime(citizen.registeredAt)}</span>
                   </div>
                 </div>
               </div>
@@ -332,23 +332,23 @@ export default function AdminUserDetailPage() {
               <div className="flex flex-col gap-2 flex-shrink-0">
                 {citizen.status === 'pending' && (
                   <Button variant="primary" size="sm" leftIcon={ShieldCheck}>
-                    Verify Citizen
+                    Verificar Ciudadano
                   </Button>
                 )}
                 {citizen.status !== 'suspended' ? (
                   <Button variant="outline" size="sm" leftIcon={Ban}>
-                    Suspend
+                    Suspender
                   </Button>
                 ) : (
                   <Button variant="outline" size="sm" leftIcon={Shield}>
-                    Reactivate
+                    Reactivar
                   </Button>
                 )}
                 <Button variant="outline" size="sm" leftIcon={FileText}>
-                  Issue Document
+                  Emitir Documento
                 </Button>
                 <Button variant="ghost" size="sm" leftIcon={KeyRound}>
-                  Reset Password
+                  Restablecer Contraseña
                 </Button>
               </div>
             </div>
@@ -387,7 +387,7 @@ export default function AdminUserDetailPage() {
                       Documentos ({citizenDocuments.length})
                     </CardTitle>
                     <Button variant="outline" size="sm" leftIcon={Plus}>
-                      Issue New
+                      Emitir Nuevo
                     </Button>
                   </div>
                 </CardHeader>
@@ -395,7 +395,7 @@ export default function AdminUserDetailPage() {
                   {citizenDocuments.length === 0 ? (
                     <div className="px-6 py-12 text-center">
                       <FileText className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                      <p className="text-sm text-text-secondary">No documents issued yet</p>
+                      <p className="text-sm text-text-secondary">Aún no se han emitido documentos</p>
                     </div>
                   ) : (
                     <div className="divide-y divide-gray-100">
@@ -649,13 +649,13 @@ export default function AdminUserDetailPage() {
             {activeTab === 'activity' && (
               <Card variant="elevated">
                 <CardHeader>
-                  <CardTitle>Activity Log</CardTitle>
+                  <CardTitle>Registro de Actividad</CardTitle>
                 </CardHeader>
                 <CardBody className="!p-0">
                   {citizenActivity.length === 0 ? (
                     <div className="px-6 py-12 text-center">
                       <Activity className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                      <p className="text-sm text-text-secondary">No activity recorded</p>
+                      <p className="text-sm text-text-secondary">Sin actividad registrada</p>
                     </div>
                   ) : (
                     <div className="divide-y divide-gray-100">
@@ -701,37 +701,37 @@ export default function AdminUserDetailPage() {
             {/* Quick Summary */}
             <Card variant="elevated">
               <CardHeader>
-                <CardTitle>Summary</CardTitle>
+                <CardTitle>Resumen</CardTitle>
               </CardHeader>
               <CardBody>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-text-secondary">Total Documents</span>
+                    <span className="text-xs text-text-secondary">Total de Documentos</span>
                     <span className="text-sm font-bold text-text-primary">
                       {citizen.documentsCount}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-text-secondary">Verified</span>
+                    <span className="text-xs text-text-secondary">Verificados</span>
                     <span className="text-sm font-bold text-green-600">
                       {citizen.verifiedDocuments}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-text-secondary">Pending</span>
+                    <span className="text-xs text-text-secondary">Pendientes</span>
                     <span className="text-sm font-bold text-yellow-600">
                       {citizen.documentsCount - citizen.verifiedDocuments}
                     </span>
                   </div>
                   <div className="h-px bg-gray-100" />
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-text-secondary">Last Active</span>
+                    <span className="text-xs text-text-secondary">Última Actividad</span>
                     <span className="text-xs font-medium text-text-primary">
                       {formatRelativeTime(citizen.lastActiveAt)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-text-secondary">Member Since</span>
+                    <span className="text-xs text-text-secondary">Miembro Desde</span>
                     <span className="text-xs font-medium text-text-primary">
                       {formatDate(citizen.registeredAt)}
                     </span>
@@ -740,7 +740,7 @@ export default function AdminUserDetailPage() {
                   {/* Completion bar */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-text-secondary">Profile Completion</span>
+                      <span className="text-xs text-text-secondary">Perfil Completado</span>
                       <span className="text-xs font-bold text-text-primary">
                         {citizen.status === 'verified' ? '100' : citizen.status === 'pending' ? '60' : '40'}%
                       </span>
@@ -768,7 +768,7 @@ export default function AdminUserDetailPage() {
             <Card variant="elevated">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Admin Notes</CardTitle>
+                  <CardTitle>Notas del Administrador</CardTitle>
                   <Badge status="default" size="sm">
                     {mockNotes.length}
                   </Badge>
@@ -796,7 +796,7 @@ export default function AdminUserDetailPage() {
                     <textarea
                       value={newNote}
                       onChange={(e) => setNewNote(e.target.value)}
-                      placeholder="Add a note..."
+                      placeholder="Agregar una nota..."
                       rows={3}
                       className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:ring-2 focus:ring-colombia-blue/30 focus:border-colombia-blue resize-none"
                     />
@@ -807,7 +807,7 @@ export default function AdminUserDetailPage() {
                         leftIcon={Send}
                         disabled={!newNote.trim()}
                       >
-                        Add Note
+                        Agregar Nota
                       </Button>
                     </div>
                   </div>
@@ -818,30 +818,30 @@ export default function AdminUserDetailPage() {
             {/* Quick Actions */}
             <Card variant="elevated">
               <CardHeader>
-                <CardTitle>Actions</CardTitle>
+                <CardTitle>Acciones</CardTitle>
               </CardHeader>
               <CardBody>
                 <div className="space-y-2">
                   <button className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 text-sm text-text-primary transition-colors">
                     <Copy className="w-4 h-4 text-gray-500" />
-                    Copy Citizen ID
+                    Copiar ID del Ciudadano
                   </button>
                   <button className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 text-sm text-text-primary transition-colors">
                     <Printer className="w-4 h-4 text-gray-500" />
-                    Print Profile
+                    Imprimir Perfil
                   </button>
                   <button className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 text-sm text-text-primary transition-colors">
                     <Download className="w-4 h-4 text-gray-500" />
-                    Export Data
+                    Exportar Datos
                   </button>
                   <button className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 text-sm text-text-primary transition-colors">
                     <Mail className="w-4 h-4 text-gray-500" />
-                    Send Notification
+                    Enviar Notificación
                   </button>
                   <div className="h-px bg-gray-100 my-1" />
                   <button className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-red-50 text-sm text-red-600 transition-colors">
                     <Trash2 className="w-4 h-4" />
-                    Delete Account
+                    Eliminar Cuenta
                   </button>
                 </div>
               </CardBody>

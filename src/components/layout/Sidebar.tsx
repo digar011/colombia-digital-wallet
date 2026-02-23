@@ -28,7 +28,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    label: 'Dashboard',
+    label: 'Panel de Control',
     href: '/admin/dashboard',
     icon: LayoutDashboard,
     matchPrefix: '/admin/dashboard',
@@ -46,13 +46,13 @@ const navItems: NavItem[] = [
     matchPrefix: '/admin/documents',
   },
   {
-    label: 'Analitica',
+    label: 'Analítica',
     href: '/admin/analytics',
     icon: BarChart3,
     matchPrefix: '/admin/analytics',
   },
   {
-    label: 'Configuracion',
+    label: 'Configuración',
     href: '/admin/settings',
     icon: Settings,
     matchPrefix: '/admin/settings',
@@ -109,7 +109,7 @@ export function Sidebar({ role = 'admin', className }: SidebarProps) {
               className="text-sm font-bold truncate"
               style={{ color: country.colors.secondary }}
             >
-              Admin Panel
+              Panel Administrativo
             </h2>
             <p className="text-[10px] text-gray-400 truncate">
               {country.name} Digital
@@ -241,7 +241,7 @@ export function Sidebar({ role = 'admin', className }: SidebarProps) {
             'hover:bg-gray-50 dark:hover:bg-gray-800',
             'transition-all duration-200'
           )}
-          aria-label={isCollapsed ? 'Expandir menu' : 'Colapsar menu'}
+          aria-label={isCollapsed ? 'Expandir menú' : 'Colapsar menú'}
         >
           {isCollapsed ? (
             <ChevronRight size={18} />

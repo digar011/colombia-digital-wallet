@@ -155,14 +155,14 @@ export default function AdminDocumentsPage() {
         {/* ── Header ──────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-text-primary">Document Management</h1>
+            <h1 className="text-2xl font-bold text-text-primary">Gesti&oacute;n de Documentos</h1>
             <p className="text-sm text-text-secondary mt-1">
-              Issue, manage, and revoke citizen documents
+              Emitir, gestionar y revocar documentos ciudadanos
             </p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" leftIcon={Download}>
-              Export
+              Exportar
             </Button>
             <Button
               variant="primary"
@@ -170,7 +170,7 @@ export default function AdminDocumentsPage() {
               leftIcon={FilePlus}
               onClick={() => setShowIssueForm(true)}
             >
-              Issue Document
+              Emitir Documento
             </Button>
           </div>
         </div>
@@ -183,7 +183,7 @@ export default function AdminDocumentsPage() {
                 <FileText className="w-5 h-5 text-blue-700" />
               </div>
               <div>
-                <p className="text-xs text-text-secondary">Total Issued</p>
+                <p className="text-xs text-text-secondary">Total Emitidos</p>
                 <p className="text-xl font-bold text-text-primary">{docStats.total}</p>
               </div>
             </div>
@@ -194,7 +194,7 @@ export default function AdminDocumentsPage() {
                 <FileCheck className="w-5 h-5 text-green-700" />
               </div>
               <div>
-                <p className="text-xs text-text-secondary">Active</p>
+                <p className="text-xs text-text-secondary">Activos</p>
                 <p className="text-xl font-bold text-green-600">{docStats.active}</p>
               </div>
             </div>
@@ -205,7 +205,7 @@ export default function AdminDocumentsPage() {
                 <Clock className="w-5 h-5 text-yellow-700" />
               </div>
               <div>
-                <p className="text-xs text-text-secondary">Pending</p>
+                <p className="text-xs text-text-secondary">Pendientes</p>
                 <p className="text-xl font-bold text-yellow-600">{docStats.pending}</p>
               </div>
             </div>
@@ -216,7 +216,7 @@ export default function AdminDocumentsPage() {
                 <FileX className="w-5 h-5 text-red-700" />
               </div>
               <div>
-                <p className="text-xs text-text-secondary">Revoked</p>
+                <p className="text-xs text-text-secondary">Revocados</p>
                 <p className="text-xl font-bold text-red-600">{docStats.revoked}</p>
               </div>
             </div>
@@ -229,8 +229,8 @@ export default function AdminDocumentsPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Issue New Document</CardTitle>
-                  <CardDescription>Fill in the details to issue a new document</CardDescription>
+                  <CardTitle>Emitir Nuevo Documento</CardTitle>
+                  <CardDescription>Completa los detalles para emitir un nuevo documento</CardDescription>
                 </div>
                 <button
                   onClick={() => setShowIssueForm(false)}
@@ -245,7 +245,7 @@ export default function AdminDocumentsPage() {
                 {/* Citizen selector */}
                 <div>
                   <label className="block text-sm font-medium text-text-primary mb-1.5">
-                    Citizen <span className="text-red-500">*</span>
+                    Ciudadano <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <select
@@ -255,7 +255,7 @@ export default function AdminDocumentsPage() {
                       }
                       className="w-full h-10 px-3 pr-8 rounded-lg border border-gray-200 bg-white text-sm text-text-primary appearance-none focus:outline-none focus:ring-2 focus:ring-colombia-blue/30 focus:border-colombia-blue"
                     >
-                      <option value="">Select a citizen...</option>
+                      <option value="">Seleccionar ciudadano...</option>
                       {mockCitizens
                         .filter((c) => c.status === 'verified')
                         .map((c) => (
@@ -271,7 +271,7 @@ export default function AdminDocumentsPage() {
                 {/* Document type selector */}
                 <div>
                   <label className="block text-sm font-medium text-text-primary mb-1.5">
-                    Document Type <span className="text-red-500">*</span>
+                    Tipo de Documento <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <select
@@ -284,7 +284,7 @@ export default function AdminDocumentsPage() {
                       }
                       className="w-full h-10 px-3 pr-8 rounded-lg border border-gray-200 bg-white text-sm text-text-primary appearance-none focus:outline-none focus:ring-2 focus:ring-colombia-blue/30 focus:border-colombia-blue"
                     >
-                      <option value="">Select type...</option>
+                      <option value="">Seleccionar tipo...</option>
                       {mockDocumentTemplates
                         .filter((t) => t.active)
                         .map((t) => (
@@ -300,14 +300,14 @@ export default function AdminDocumentsPage() {
                 {/* Notes */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-text-primary mb-1.5">
-                    Notes (optional)
+                    Notas (opcional)
                   </label>
                   <textarea
                     value={issueFormData.notes}
                     onChange={(e) =>
                       setIssueFormData({ ...issueFormData, notes: e.target.value })
                     }
-                    placeholder="Additional notes for this issuance..."
+                    placeholder="Notas adicionales para esta emisión..."
                     rows={3}
                     className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:ring-2 focus:ring-colombia-blue/30 focus:border-colombia-blue resize-none"
                   />
@@ -320,7 +320,7 @@ export default function AdminDocumentsPage() {
                   <div className="flex items-center gap-2 mb-2">
                     <Eye className="w-4 h-4 text-text-secondary" />
                     <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                      Template Preview
+                      Vista Previa de Plantilla
                     </span>
                   </div>
                   {(() => {
@@ -331,15 +331,15 @@ export default function AdminDocumentsPage() {
                     return (
                       <div className="grid grid-cols-3 gap-3 text-sm">
                         <div>
-                          <p className="text-xs text-text-secondary">Template</p>
+                          <p className="text-xs text-text-secondary">Plantilla</p>
                           <p className="font-medium text-text-primary">{tmpl.name}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-text-secondary">Version</p>
+                          <p className="text-xs text-text-secondary">Versión</p>
                           <p className="font-medium text-text-primary">v{tmpl.version}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-text-secondary">Fields</p>
+                          <p className="text-xs text-text-secondary">Campos</p>
                           <p className="font-medium text-text-primary">{tmpl.fieldsCount}</p>
                         </div>
                       </div>
@@ -349,7 +349,7 @@ export default function AdminDocumentsPage() {
                   <div className="mt-3 h-32 bg-white rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
                     <div className="text-center">
                       <FileText className="w-8 h-8 text-gray-300 mx-auto mb-1" />
-                      <p className="text-xs text-text-secondary">Document preview will render here</p>
+                      <p className="text-xs text-text-secondary">La vista previa del documento se mostrará aquí</p>
                     </div>
                   </div>
                 </div>
@@ -358,7 +358,7 @@ export default function AdminDocumentsPage() {
             <CardFooter>
               <div className="flex items-center gap-2 ml-auto">
                 <Button variant="ghost" size="sm" onClick={() => setShowIssueForm(false)}>
-                  Cancel
+                  Cancelar
                 </Button>
                 <Button
                   variant="primary"
@@ -366,7 +366,7 @@ export default function AdminDocumentsPage() {
                   leftIcon={Send}
                   disabled={!issueFormData.citizenId || !issueFormData.documentType}
                 >
-                  Issue Document
+                  Emitir Documento
                 </Button>
               </div>
             </CardFooter>
@@ -378,9 +378,9 @@ export default function AdminDocumentsPage() {
           <nav className="flex gap-0 -mb-px">
             {(
               [
-                { id: 'queue' as PageTab, label: 'Issuance Queue', count: pendingDocs.length },
-                { id: 'issued' as PageTab, label: 'All Documents', count: mockIssuedDocuments.length },
-                { id: 'templates' as PageTab, label: 'Templates', count: mockDocumentTemplates.length },
+                { id: 'queue' as PageTab, label: 'Cola de Emisión', count: pendingDocs.length },
+                { id: 'issued' as PageTab, label: 'Todos los Documentos', count: mockIssuedDocuments.length },
+                { id: 'templates' as PageTab, label: 'Plantillas', count: mockDocumentTemplates.length },
               ] as const
             ).map((tab) => (
               <button
@@ -413,13 +413,13 @@ export default function AdminDocumentsPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Pending Issuance Queue</CardTitle>
+                  <CardTitle>Cola de Emisión Pendiente</CardTitle>
                   <CardDescription>
-                    Documents awaiting approval and issuance
+                    Documentos en espera de aprobación y emisión
                   </CardDescription>
                 </div>
                 <Button variant="primary" size="sm" leftIcon={CheckCircle2}>
-                  Approve All
+                  Aprobar Todos
                 </Button>
               </div>
             </CardHeader>
@@ -427,9 +427,9 @@ export default function AdminDocumentsPage() {
               {pendingDocs.length === 0 ? (
                 <div className="px-6 py-12 text-center">
                   <CheckCircle2 className="w-12 h-12 text-green-300 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-text-secondary">Queue is empty</p>
+                  <p className="text-sm font-medium text-text-secondary">Cola vacía</p>
                   <p className="text-xs text-text-secondary mt-1">
-                    All documents have been processed
+                    Todos los documentos han sido procesados
                   </p>
                 </div>
               ) : (
@@ -455,15 +455,15 @@ export default function AdminDocumentsPage() {
                           {doc.citizenName} &middot; {doc.documentNumber}
                         </p>
                         <p className="text-xs text-text-secondary">
-                          Requested {formatRelativeTime(doc.issuedAt)} &middot; By {doc.issuedBy}
+                          Solicitado {formatRelativeTime(doc.issuedAt)} &middot; Por {doc.issuedBy}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
                         <Button variant="primary" size="sm" leftIcon={CheckCircle2}>
-                          Approve
+                          Aprobar
                         </Button>
                         <Button variant="outline" size="sm" leftIcon={Ban}>
-                          Reject
+                          Rechazar
                         </Button>
                       </div>
                     </div>
@@ -483,7 +483,7 @@ export default function AdminDocumentsPage() {
                 <div className="flex flex-col md:flex-row gap-3">
                   <div className="flex-1">
                     <Input
-                      placeholder="Search by citizen name or document number..."
+                      placeholder="Buscar por nombre o número de documento..."
                       leftIcon={Search}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
@@ -496,7 +496,7 @@ export default function AdminDocumentsPage() {
                       leftIcon={Filter}
                       onClick={() => setShowFilters(!showFilters)}
                     >
-                      Filters
+                      Filtros
                     </Button>
                     {hasFilters && (
                       <Button
@@ -508,7 +508,7 @@ export default function AdminDocumentsPage() {
                           setTypeFilter('');
                         }}
                       >
-                        Clear
+                        Limpiar
                       </Button>
                     )}
                   </div>
@@ -518,7 +518,7 @@ export default function AdminDocumentsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 pt-4 border-t border-gray-100">
                     <div>
                       <label className="block text-xs font-medium text-text-secondary mb-1.5">
-                        Status
+                        Estado
                       </label>
                       <div className="relative">
                         <select
@@ -526,18 +526,18 @@ export default function AdminDocumentsPage() {
                           onChange={(e) => setStatusFilter(e.target.value)}
                           className="w-full h-10 px-3 pr-8 rounded-lg border border-gray-200 bg-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-colombia-blue/30"
                         >
-                          <option value="">All statuses</option>
-                          <option value="active">Active</option>
-                          <option value="pending">Pending</option>
-                          <option value="revoked">Revoked</option>
-                          <option value="expired">Expired</option>
+                          <option value="">Todos los estados</option>
+                          <option value="active">Activo</option>
+                          <option value="pending">Pendiente</option>
+                          <option value="revoked">Revocado</option>
+                          <option value="expired">Expirado</option>
                         </select>
                         <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                       </div>
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-text-secondary mb-1.5">
-                        Document Type
+                        Tipo de Documento
                       </label>
                       <div className="relative">
                         <select
@@ -545,7 +545,7 @@ export default function AdminDocumentsPage() {
                           onChange={(e) => setTypeFilter(e.target.value)}
                           className="w-full h-10 px-3 pr-8 rounded-lg border border-gray-200 bg-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-colombia-blue/30"
                         >
-                          <option value="">All types</option>
+                          <option value="">Todos los tipos</option>
                           <option value="cedula">Cedula de Ciudadania</option>
                           <option value="passport">Pasaporte</option>
                           <option value="license">Licencia de Conduccion</option>
@@ -565,14 +565,14 @@ export default function AdminDocumentsPage() {
             {selectedDocIds.size > 0 && (
               <div className="flex items-center gap-3 bg-colombia-blue text-white px-4 py-3 rounded-xl">
                 <span className="text-sm font-medium">
-                  {selectedDocIds.size} document{selectedDocIds.size !== 1 ? 's' : ''} selected
+                  {selectedDocIds.size} documento{selectedDocIds.size !== 1 ? 's' : ''} seleccionado{selectedDocIds.size !== 1 ? 's' : ''}
                 </span>
                 <div className="flex items-center gap-2 ml-auto">
                   <Button variant="ghost" size="sm" className="!text-white hover:!bg-white/20" leftIcon={Ban}>
-                    Revoke Selected
+                    Revocar Seleccionados
                   </Button>
                   <Button variant="ghost" size="sm" className="!text-white hover:!bg-white/20" leftIcon={Download}>
-                    Export Selected
+                    Exportar Seleccionados
                   </Button>
                   <Button
                     variant="ghost"
@@ -580,7 +580,7 @@ export default function AdminDocumentsPage() {
                     className="!text-white hover:!bg-white/20"
                     onClick={() => setSelectedDocIds(new Set())}
                   >
-                    Clear
+                    Limpiar
                   </Button>
                 </div>
               </div>
@@ -610,22 +610,22 @@ export default function AdminDocumentsPage() {
                         />
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                        Document
+                        Documento
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                        Citizen
+                        Ciudadano
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                        Status
+                        Estado
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider hidden md:table-cell">
-                        Issued
+                        Emitido
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider hidden lg:table-cell">
-                        Expires
+                        Expira
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider hidden lg:table-cell">
-                        Issued By
+                        Emitido Por
                       </th>
                       <th className="w-12 px-4 py-3" />
                     </tr>
@@ -636,7 +636,7 @@ export default function AdminDocumentsPage() {
                         <td colSpan={8} className="px-4 py-12 text-center">
                           <FileText className="w-12 h-12 text-gray-300 mx-auto mb-2" />
                           <p className="text-sm font-medium text-text-secondary">
-                            No documents found
+                            No se encontraron documentos
                           </p>
                         </td>
                       </tr>
@@ -723,19 +723,19 @@ export default function AdminDocumentsPage() {
                               {activeRowMenu === doc.id && (
                                 <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
                                   <button className="w-full px-3 py-2 text-left text-sm text-text-primary hover:bg-gray-50 flex items-center gap-2">
-                                    <Eye className="w-4 h-4" /> View Details
+                                    <Eye className="w-4 h-4" /> Ver Detalles
                                   </button>
                                   <button className="w-full px-3 py-2 text-left text-sm text-text-primary hover:bg-gray-50 flex items-center gap-2">
-                                    <Copy className="w-4 h-4" /> Copy Number
+                                    <Copy className="w-4 h-4" /> Copiar Número
                                   </button>
                                   <button className="w-full px-3 py-2 text-left text-sm text-text-primary hover:bg-gray-50 flex items-center gap-2">
-                                    <Download className="w-4 h-4" /> Download
+                                    <Download className="w-4 h-4" /> Descargar
                                   </button>
                                   {doc.status === 'active' && (
                                     <>
                                       <div className="border-t border-gray-100 my-1" />
                                       <button className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
-                                        <Ban className="w-4 h-4" /> Revoke
+                                        <Ban className="w-4 h-4" /> Revocar
                                       </button>
                                     </>
                                   )}
@@ -743,7 +743,7 @@ export default function AdminDocumentsPage() {
                                     <>
                                       <div className="border-t border-gray-100 my-1" />
                                       <button className="w-full px-3 py-2 text-left text-sm text-green-600 hover:bg-green-50 flex items-center gap-2">
-                                        <RotateCcw className="w-4 h-4" /> Reinstate
+                                        <RotateCcw className="w-4 h-4" /> Reinstalar
                                       </button>
                                     </>
                                   )}
@@ -762,9 +762,9 @@ export default function AdminDocumentsPage() {
               {filteredDocs.length > 0 && (
                 <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50/50">
                   <p className="text-sm text-text-secondary">
-                    Showing {(currentPage - 1) * pageSize + 1}
+                    Mostrando {(currentPage - 1) * pageSize + 1}
                     {' '}-{' '}
-                    {Math.min(currentPage * pageSize, filteredDocs.length)} of{' '}
+                    {Math.min(currentPage * pageSize, filteredDocs.length)} de{' '}
                     {filteredDocs.length}
                   </p>
                   <div className="flex items-center gap-1">
@@ -810,7 +810,7 @@ export default function AdminDocumentsPage() {
                 {!tmpl.active && (
                   <div className="absolute top-3 right-3">
                     <Badge status="default" size="sm">
-                      Inactive
+                      Inactivo
                     </Badge>
                   </div>
                 )}
@@ -828,18 +828,18 @@ export default function AdminDocumentsPage() {
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold text-text-primary">{tmpl.name}</p>
                       <p className="text-xs text-text-secondary mt-0.5">
-                        Version {tmpl.version}
+                        Versión {tmpl.version}
                       </p>
                     </div>
                   </div>
 
                   <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <p className="text-text-secondary">Fields</p>
+                      <p className="text-text-secondary">Campos</p>
                       <p className="font-semibold text-text-primary">{tmpl.fieldsCount}</p>
                     </div>
                     <div>
-                      <p className="text-text-secondary">Last Updated</p>
+                      <p className="text-text-secondary">Última Actualización</p>
                       <p className="font-semibold text-text-primary">
                         {formatRelativeTime(tmpl.lastUpdated)}
                       </p>
@@ -859,10 +859,10 @@ export default function AdminDocumentsPage() {
 
                   <div className="mt-4 flex items-center gap-2">
                     <Button variant="outline" size="sm" fullWidth leftIcon={Eye}>
-                      Preview
+                      Vista Previa
                     </Button>
                     <Button variant="ghost" size="sm" fullWidth leftIcon={Settings2}>
-                      Edit
+                      Editar
                     </Button>
                   </div>
                 </CardBody>

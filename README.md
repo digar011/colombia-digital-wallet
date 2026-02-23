@@ -19,6 +19,7 @@ Mi Colombia Digital centralizes a citizen's government documents and services in
 - **Emergencias** — One-tap calling for 123, police, fire, ambulance
 - **Verificacion QR** — Scannable QR codes for document verification by officials
 - **Modo Sin Conexion** — Core documents available without internet connection
+- **Portal de Agencias** — Agency staff portal for 6 government agencies per country
 - **Soporte Multi-Pais** — White-label config for Colombia, Ecuador, Guatemala
 
 ### Admin Dashboard
@@ -29,6 +30,28 @@ Government administrators can:
 - View analytics and registration trends
 - Manage citizen accounts and services
 - Configure system settings
+
+### Portal de Agencias
+
+The Agency Portal (`/agency`) provides a dedicated interface for government agency staff across 3 countries, with 6 agencies per country. Agency staff can:
+
+- **Iniciar sesion institucional** — Log in with institutional credentials (`.gov.co` email)
+- **Cambiar de agencia** — Switch between agencies using the sidebar dropdown
+- **Gestion de documentos** — Manage documents issued by their agency
+- **Consulta de ciudadanos** — Look up citizen information
+- **Solicitudes de verificacion** — Handle verification requests (approve/reject)
+- **Analiticas** — View agency-specific analytics dashboards
+- **Configuracion** — Configure agency settings
+
+**Supported Countries & Agencies:**
+
+| Country | Agencies |
+|---------|----------|
+| **Colombia** | RNEC (Identidad), RUNT (Vehiculos), DIAN (Tributario), ADRES (Salud), DPS (Servicios Sociales), MinTIC (Tecnologia) |
+| **Ecuador** | Registro Civil, ANT, SRI, IESS, MIES, MINTEL |
+| **Guatemala** | RENAP, SAT-Vehiculos, SAT, IGSS, MIDES, CIV |
+
+**Agency Keys:** `identity`, `vehicles`, `tax`, `health`, `socialServices`, `technology`
 
 ## Tech Stack
 
@@ -68,10 +91,20 @@ colombia-digital-wallet/
 │   │   │       ├── documents/
 │   │   │       ├── analytics/
 │   │   │       └── settings/
+│   │   ├── (agency)/            # Agency portal (multi-country)
+│   │   │   └── agency/
+│   │   │       ├── login/       # Staff login (.gov.co email)
+│   │   │       └── [agencyKey]/ # Per-agency routes
+│   │   │           ├── dashboard/
+│   │   │           ├── documents/
+│   │   │           ├── citizens/
+│   │   │           ├── requests/
+│   │   │           ├── analytics/
+│   │   │           └── settings/
 │   │   └── api/                 # API routes
 │   ├── components/
 │   │   ├── ui/                  # Reusable UI components
-│   │   ├── layout/              # Layout (nav, header, sidebar)
+│   │   ├── layout/              # Layout (nav, header, sidebar, AgencySidebar, AgencyHeader)
 │   │   ├── documents/           # Document card components
 │   │   ├── cards/               # Dashboard cards
 │   │   ├── admin/               # Admin components
@@ -85,14 +118,15 @@ colombia-digital-wallet/
 │       ├── contexts/            # React contexts (Auth, Country)
 │       ├── utils/               # Utility functions
 │       ├── types/               # TypeScript types
-│       └── mock/                # Mock data for development
+│       └── mock/                # Mock data (citizenData, adminData, agencyData)
 ├── supabase/
 │   └── migrations/              # Database migrations (SQL)
 ├── tests/
 │   └── e2e/                     # Playwright E2E tests
 │       ├── auth/
 │       ├── citizen/
-│       └── admin/
+│       ├── admin/
+│       └── agency/              # Agency portal E2E tests
 ├── docs/
 │   ├── en/                      # English documentation
 │   └── es/                      # Spanish documentation
@@ -206,6 +240,7 @@ npm run test:e2e
 npx playwright test tests/e2e/auth/
 npx playwright test tests/e2e/citizen/
 npx playwright test tests/e2e/admin/
+npx playwright test tests/e2e/agency/
 
 # Run with UI mode
 npx playwright test --ui

@@ -79,6 +79,32 @@ const DEMO_USER: UserProfile = {
   createdAt: new Date().toISOString(),
 };
 
+// ─── Test accounts ──────────────────────────────────────────────────────────
+
+const TEST_ACCOUNTS: Record<string, { password: string; profile: UserProfile }> = {
+  admin123: {
+    password: 'Test123!',
+    profile: {
+      id: 'admin-test-001',
+      email: 'admin123@test.gov.co',
+      phone: '+573009876543',
+      firstName: 'Admin',
+      secondName: undefined,
+      firstLastName: 'Test',
+      secondLastName: 'User',
+      documentType: 'CC',
+      documentNumber: '9876543210',
+      dateOfBirth: '1985-01-15',
+      gender: 'M',
+      department: 'Cundinamarca',
+      city: 'Bogota',
+      address: 'Carrera 7 # 32-16, Edificio Gobierno',
+      verified: true,
+      createdAt: new Date().toISOString(),
+    },
+  },
+};
+
 // ─── Hook ───────────────────────────────────────────────────────────────────
 
 export function useAuth() {
@@ -130,6 +156,26 @@ export function useAuth() {
       if (!emailOrPhone.trim() || !password.trim()) {
         setState((prev) => ({ ...prev, isLoading: false }));
         return { success: false, error: 'Credenciales requeridas' };
+      }
+
+      // Check test accounts first
+      const testAccount = TEST_ACCOUNTS[emailOrPhone.trim()];
+      if (testAccount) {
+        if (password !== testAccount.password) {
+          setState((prev) => ({ ...prev, isLoading: false }));
+          return { success: false, error: 'Contrasena incorrecta' };
+        }
+        const user = testAccount.profile;
+        const token = `test-token-${Date.now()}`;
+        try {
+          localStorage.setItem(AUTH_STORAGE_KEY, token);
+          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+          document.cookie = `auth-token=${token}; path=/; max-age=86400; SameSite=Lax`;
+        } catch {
+          // Storage unavailable
+        }
+        setState({ isAuthenticated: true, isLoading: false, user });
+        return { success: true };
       }
 
       if (password.length < 6) {

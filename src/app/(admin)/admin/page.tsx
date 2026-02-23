@@ -14,7 +14,7 @@ export default function AdminIndexPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 border-3 border-colombia-blue border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-text-secondary">Redirecting to dashboard...</p>
+        <p className="text-sm text-text-secondary">Redirigiendo al panel...</p>
       </div>
     </div>
   );

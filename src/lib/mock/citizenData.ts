@@ -737,6 +737,27 @@ export function getGreeting(): string {
   return 'Buenas noches';
 }
 
+export function calculateAge(dateOfBirth: string): number {
+  const today = new Date();
+  const birth = new Date(dateOfBirth);
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+export function getIdentityDocumentInfo(dateOfBirth: string): { title: string; shortName: string; prefix: string; isMinor: boolean } {
+  const isMinor = calculateAge(dateOfBirth) < 18;
+  return {
+    title: isMinor ? 'Tarjeta de Identidad' : 'Cedula de Ciudadania',
+    shortName: isMinor ? 'TI' : 'CC',
+    prefix: isMinor ? 'TI' : 'CC',
+    isMinor,
+  };
+}
+
 export function formatCOPCurrency(amount: number): string {
   return new Intl.NumberFormat('es-CO', {
     style: 'currency',

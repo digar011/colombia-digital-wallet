@@ -11,11 +11,12 @@ Welcome to the Mi Colombia Digital project! This guide will walk you through eve
 5. [Project Conventions](#project-conventions)
 6. [Working with Mock Data](#working-with-mock-data)
 7. [Multi-Country System](#multi-country-system)
-8. [Database & Supabase](#database--supabase)
-9. [Testing Guide](#testing-guide)
-10. [Deployment](#deployment)
-11. [Common Tasks](#common-tasks)
-12. [Troubleshooting](#troubleshooting)
+8. [Agency Portal](#agency-portal)
+9. [Database & Supabase](#database--supabase)
+10. [Testing Guide](#testing-guide)
+11. [Deployment](#deployment)
+12. [Common Tasks](#common-tasks)
+13. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -27,6 +28,7 @@ Welcome to the Mi Colombia Digital project! This guide will walk you through eve
 
 - A **citizen-facing mobile web app** (Spanish UI) where users view their digital documents
 - A **government admin dashboard** for managing citizens and issuing documents
+- An **agency portal** for government agency staff to manage documents, citizens, and verification requests
 - A **multi-country framework** so the same platform can be deployed in Ecuador, Guatemala, etc.
 - An **offline-capable** system where core documents work without internet
 
@@ -36,6 +38,7 @@ Welcome to the Mi Colombia Digital project! This guide will walk you through eve
 |-----------|-------------|
 | **Citizens** | View digital ID, vehicle registration, health cards, QR verification |
 | **Government Officials** | Scan QR codes to verify citizen documents |
+| **Agency Staff** | Manage agency documents, look up citizens, handle verification requests |
 | **Admin Operators** | Issue documents, manage citizens, view analytics |
 
 ---
@@ -106,6 +109,7 @@ The app uses Next.js route groups to separate layouts:
 (auth)/     → Login, Register, Verify — minimal layout
 (citizen)/  → Citizen app — bottom nav + header
 (admin)/    → Admin dashboard — sidebar + top bar
+(agency)/   → Agency portal — AgencySidebar + AgencyHeader
 ```
 
 ### Key Directories
@@ -115,10 +119,10 @@ The app uses Next.js route groups to separate layouts:
 | `src/app/` | Pages and API routes (Next.js App Router) |
 | `src/components/ui/` | Reusable UI components (Button, Card, Input, etc.) |
 | `src/components/documents/` | Document card components (Cedula, Vehicle, Health) |
-| `src/components/layout/` | Layout components (BottomNav, Header, Sidebar) |
+| `src/components/layout/` | Layout components (BottomNav, Header, Sidebar, AgencySidebar, AgencyHeader) |
 | `src/config/countries/` | Country-specific JSON configurations |
 | `src/lib/contexts/` | React Context providers (Auth, Country) |
-| `src/lib/mock/` | Mock data for development |
+| `src/lib/mock/` | Mock data for development (citizenData, adminData, agencyData) |
 | `src/lib/supabase/` | Supabase client configuration |
 | `supabase/migrations/` | SQL database migrations |
 | `tests/e2e/` | Playwright E2E test files |
@@ -270,7 +274,68 @@ The `CountrySwitcher` component (in admin/demo mode) updates the country context
 
 ---
 
-## 8. Database & Supabase
+## 8. Agency Portal
+
+The Agency Portal is a dedicated interface for government agency staff. It supports 3 countries (Colombia, Ecuador, Guatemala) with 6 agencies per country.
+
+### Accessing the Agency Portal
+
+Navigate to `/agency` to see the agency selection portal, which displays 6 agency cards. Each card represents a government agency (e.g., RNEC, RUNT, DIAN). Staff log in at `/agency/login` with their institutional `.gov.co` email credentials.
+
+### Agency Routes
+
+| Route | Description |
+|-------|-------------|
+| `/agency` | Agency selection portal (6 agency cards) |
+| `/agency/login` | Staff login with institutional email |
+| `/agency/[agencyKey]/dashboard` | Agency dashboard with key metrics |
+| `/agency/[agencyKey]/documents` | Document management (issued by the agency) |
+| `/agency/[agencyKey]/citizens` | Citizen lookup and search |
+| `/agency/[agencyKey]/requests` | Verification requests (approve/reject) |
+| `/agency/[agencyKey]/analytics` | Agency-specific analytics |
+| `/agency/[agencyKey]/settings` | Agency configuration |
+
+**Agency Keys:** `identity`, `vehicles`, `tax`, `health`, `socialServices`, `technology`
+
+### Supported Agencies by Country
+
+| Country | Agencies |
+|---------|----------|
+| **Colombia** | RNEC (Identidad), RUNT (Vehiculos), DIAN (Tributario), ADRES (Salud), DPS (Servicios Sociales), MinTIC (Tecnologia) |
+| **Ecuador** | Registro Civil, ANT, SRI, IESS, MIES, MINTEL |
+| **Guatemala** | RENAP, SAT-Vehiculos, SAT, IGSS, MIDES, CIV |
+
+### Agency Portal Features
+
+- **Sidebar dropdown** — Switch between agencies without logging out
+- **Document management** — View, issue, and revoke documents for the agency's domain
+- **Citizen lookup** — Search citizens by cedula number, name, or other identifiers
+- **Verification requests** — Queue of pending requests that staff can approve or reject
+- **Analytics dashboard** — Agency-specific metrics (documents issued, verifications, trends)
+- **Settings** — Configure agency parameters, notifications, and staff access
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/app/(agency)/layout.tsx` | Agency layout with AgencySidebar and AgencyHeader |
+| `src/app/(agency)/agency/page.tsx` | Agency selection portal |
+| `src/app/(agency)/agency/login/page.tsx` | Staff login page |
+| `src/app/(agency)/agency/[agencyKey]/page.tsx` | Agency root (redirects to dashboard) |
+| `src/app/(agency)/agency/[agencyKey]/dashboard/page.tsx` | Agency dashboard |
+| `src/app/(agency)/agency/[agencyKey]/documents/page.tsx` | Document management |
+| `src/app/(agency)/agency/[agencyKey]/citizens/page.tsx` | Citizen lookup |
+| `src/app/(agency)/agency/[agencyKey]/requests/page.tsx` | Verification requests |
+| `src/app/(agency)/agency/[agencyKey]/analytics/page.tsx` | Analytics |
+| `src/app/(agency)/agency/[agencyKey]/settings/page.tsx` | Configuration |
+| `src/components/layout/AgencySidebar.tsx` | Agency sidebar with dropdown switcher |
+| `src/components/layout/AgencyHeader.tsx` | Agency header bar |
+| `src/lib/mock/agencyData.ts` | Mock data for all agencies across 3 countries |
+| `tests/e2e/agency/agency.spec.ts` | E2E tests for the agency portal |
+
+---
+
+## 9. Database & Supabase
 
 ### Local Development
 
@@ -292,7 +357,7 @@ Refer to the [README.md](../../README.md#database-schema) for the full table lis
 
 ---
 
-## 9. Testing Guide
+## 10. Testing Guide
 
 ### Running Tests
 
@@ -304,6 +369,7 @@ npm run test:e2e
 npx playwright test tests/e2e/auth/
 npx playwright test tests/e2e/citizen/
 npx playwright test tests/e2e/admin/
+npx playwright test tests/e2e/agency/
 
 # Interactive UI mode
 npx playwright test --ui
@@ -334,11 +400,12 @@ auth.spec.ts           — Authentication flows
 citizen-dashboard.spec.ts — Citizen dashboard
 citizen-documents.spec.ts — Document viewing
 admin-dashboard.spec.ts   — Admin dashboard
+agency.spec.ts            — Agency portal
 ```
 
 ---
 
-## 10. Deployment
+## 11. Deployment
 
 ### Vercel (Recommended)
 
@@ -358,7 +425,7 @@ admin-dashboard.spec.ts   — Admin dashboard
 
 ---
 
-## 11. Common Tasks
+## 12. Common Tasks
 
 ### Add a new document type
 
@@ -385,7 +452,7 @@ admin-dashboard.spec.ts   — Admin dashboard
 
 ---
 
-## 12. Troubleshooting
+## 13. Troubleshooting
 
 ### Common Issues
 

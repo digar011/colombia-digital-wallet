@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   TrendingUp,
   TrendingDown,
@@ -10,6 +11,7 @@ import {
   Users,
   Download,
   FileText,
+  ExternalLink,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardBody, CardDescription } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -77,6 +79,7 @@ function MiniBarChart({
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 export default function AdminAnalyticsPage() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [dateRange, setDateRange] = useState<DateRange>('30d');
   const [sortDeptBy, setSortDeptBy] = useState<'citizens' | 'verificationRate'>('citizens');
@@ -111,11 +114,11 @@ export default function AdminAnalyticsPage() {
 
   // Chart data
   const regChartData = rangeData.map((d) => ({
-    label: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    label: new Date(d.date).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' }),
     value: d.registrations,
   }));
   const userChartData = rangeData.map((d) => ({
-    label: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    label: new Date(d.date).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' }),
     value: d.activeUsers,
   }));
 
@@ -162,9 +165,9 @@ export default function AdminAnalyticsPage() {
         {/* ── Header ──────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-text-primary">Analytics</h1>
+            <h1 className="text-2xl font-bold text-text-primary">Analítica</h1>
             <p className="text-sm text-text-secondary mt-1">
-              Insights and performance metrics for the digital wallet platform
+              Métricas de rendimiento y análisis de la plataforma de billetera digital
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -179,28 +182,38 @@ export default function AdminAnalyticsPage() {
                       : 'text-text-secondary hover:text-text-primary'
                   }`}
                 >
-                  {range === '7d' ? '7 Days' : range === '14d' ? '14 Days' : '30 Days'}
+                  {range === '7d' ? '7 Días' : range === '14d' ? '14 Días' : '30 Días'}
                 </button>
               ))}
             </div>
             <Button variant="outline" size="sm" leftIcon={Download}>
-              Export Report
+              Exportar Reporte
             </Button>
           </div>
         </div>
 
-        {/* ── Summary Cards ───────────────────────────────────── */}
+        {/* ── Summary Cards (clickable links to sections) ────── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Registrations', value: totalRegistrations, trend: regTrend, icon: <Users className="w-5 h-5 text-blue-700" />, bg: 'bg-blue-100' },
-            { label: 'Verifications', value: totalVerifications, trend: verTrend, icon: <ShieldCheck className="w-5 h-5 text-green-700" />, bg: 'bg-green-100' },
-            { label: 'Documents Issued', value: totalDocIssued, trend: docTrend, icon: <FileText className="w-5 h-5 text-yellow-700" />, bg: 'bg-yellow-100' },
-            { label: 'Avg Active Users', value: avgActiveUsers, trend: userTrend, icon: <Activity className="w-5 h-5 text-purple-700" />, bg: 'bg-purple-100' },
+            { label: 'Registros', value: totalRegistrations, trend: regTrend, icon: <Users className="w-5 h-5 text-blue-700" />, bg: 'bg-blue-100', href: '/admin/users' },
+            { label: 'Verificaciones', value: totalVerifications, trend: verTrend, icon: <ShieldCheck className="w-5 h-5 text-green-700" />, bg: 'bg-green-100', href: '/admin/documents' },
+            { label: 'Documentos Emitidos', value: totalDocIssued, trend: docTrend, icon: <FileText className="w-5 h-5 text-yellow-700" />, bg: 'bg-yellow-100', href: '/admin/documents' },
+            { label: 'Usuarios Activos Promedio', value: avgActiveUsers, trend: userTrend, icon: <Activity className="w-5 h-5 text-purple-700" />, bg: 'bg-purple-100', href: '/admin/users' },
           ].map((card) => (
-            <Card key={card.label} variant="elevated" padding="md">
+            <Card
+              key={card.label}
+              variant="elevated"
+              padding="md"
+              clickable
+              onClick={() => router.push(card.href)}
+              className="cursor-pointer hover:ring-2 hover:ring-colombia-blue/30 transition-all"
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-text-secondary">{card.label}</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs text-text-secondary">{card.label}</p>
+                    <ExternalLink className="w-3 h-3 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
                   <p className="text-xl font-bold text-text-primary mt-0.5">
                     {formatNumber(card.value)}
                   </p>
@@ -216,7 +229,7 @@ export default function AdminAnalyticsPage() {
                 <span className={`text-xs font-semibold ${card.trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
                   {card.trend.value}%
                 </span>
-                <span className="text-[10px] text-text-secondary">vs prev period</span>
+                <span className="text-[10px] text-text-secondary">vs periodo anterior</span>
               </div>
             </Card>
           ))}
@@ -229,9 +242,9 @@ export default function AdminAnalyticsPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Registration Trends</CardTitle>
+                  <CardTitle>Tendencias de Registro</CardTitle>
                   <CardDescription>
-                    Daily new registrations ({dateRange === '7d' ? 'last 7 days' : dateRange === '14d' ? 'last 14 days' : 'last 30 days'})
+                    Registros diarios nuevos ({dateRange === '7d' ? 'últimos 7 días' : dateRange === '14d' ? 'últimos 14 días' : 'últimos 30 días'})
                   </CardDescription>
                 </div>
                 <Badge status="info" size="sm">
@@ -261,8 +274,8 @@ export default function AdminAnalyticsPage() {
                 <MiniBarChart data={regChartData} maxVal={maxReg} color="#003893" />
               )}
               <div className="mt-3 flex items-center justify-between text-[10px] text-text-secondary border-t border-gray-100 pt-2">
-                <span>Avg: {Math.round(totalRegistrations / rangeData.length)}/day</span>
-                <span>Peak: {Math.max(...rangeData.map((d) => d.registrations))} registrations</span>
+                <span>Promedio: {Math.round(totalRegistrations / rangeData.length)}/día</span>
+                <span>Pico: {Math.max(...rangeData.map((d) => d.registrations))} registros</span>
               </div>
             </CardBody>
           </Card>
@@ -272,11 +285,11 @@ export default function AdminAnalyticsPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Active Users</CardTitle>
-                  <CardDescription>Daily active user count</CardDescription>
+                  <CardTitle>Usuarios Activos</CardTitle>
+                  <CardDescription>Conteo de usuarios activos diarios</CardDescription>
                 </div>
                 <Badge status="active" size="sm">
-                  {formatNumber(avgActiveUsers)} avg
+                  {formatNumber(avgActiveUsers)} prom
                 </Badge>
               </div>
             </CardHeader>
@@ -302,8 +315,8 @@ export default function AdminAnalyticsPage() {
                 <MiniBarChart data={userChartData} maxVal={maxUsers} color="#22C55E" />
               )}
               <div className="mt-3 flex items-center justify-between text-[10px] text-text-secondary border-t border-gray-100 pt-2">
-                <span>Min: {formatNumber(Math.min(...rangeData.map((d) => d.activeUsers)))}</span>
-                <span>Max: {formatNumber(Math.max(...rangeData.map((d) => d.activeUsers)))}</span>
+                <span>Mín: {formatNumber(Math.min(...rangeData.map((d) => d.activeUsers)))}</span>
+                <span>Máx: {formatNumber(Math.max(...rangeData.map((d) => d.activeUsers)))}</span>
               </div>
             </CardBody>
           </Card>
@@ -314,7 +327,7 @@ export default function AdminAnalyticsPage() {
           {/* Document Types Breakdown */}
           <Card variant="elevated">
             <CardHeader>
-              <CardTitle>Document Types Breakdown</CardTitle>
+              <CardTitle>Desglose por Tipo de Documento</CardTitle>
             </CardHeader>
             <CardBody>
               <div className="flex gap-6">
@@ -383,7 +396,7 @@ export default function AdminAnalyticsPage() {
           <Card variant="elevated">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Geographic Distribution</CardTitle>
+                <CardTitle>Distribución Geográfica</CardTitle>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setSortDeptBy('citizens')}
@@ -391,7 +404,7 @@ export default function AdminAnalyticsPage() {
                       sortDeptBy === 'citizens' ? 'bg-colombia-blue text-white' : 'text-text-secondary hover:bg-gray-100'
                     }`}
                   >
-                    By Citizens
+                    Por Ciudadanos
                   </button>
                   <button
                     onClick={() => setSortDeptBy('verificationRate')}
@@ -399,7 +412,7 @@ export default function AdminAnalyticsPage() {
                       sortDeptBy === 'verificationRate' ? 'bg-colombia-blue text-white' : 'text-text-secondary hover:bg-gray-100'
                     }`}
                   >
-                    By Rate
+                    Por Tasa
                   </button>
                 </div>
               </div>
@@ -443,7 +456,7 @@ export default function AdminAnalyticsPage() {
           {/* Verification Success Rates */}
           <Card variant="elevated">
             <CardHeader>
-              <CardTitle>Verification Success Rates</CardTitle>
+              <CardTitle>Tasas de Éxito de Verificación</CardTitle>
             </CardHeader>
             <CardBody>
               <div className="space-y-4">
@@ -453,7 +466,7 @@ export default function AdminAnalyticsPage() {
                       <span className="text-xs text-text-primary font-medium">{method.method}</span>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] text-text-secondary">
-                          {formatNumber(method.totalAttempts)} attempts
+                          {formatNumber(method.totalAttempts)} intentos
                         </span>
                         <span
                           className={`text-xs font-bold ${
@@ -476,7 +489,7 @@ export default function AdminAnalyticsPage() {
                 ))}
               </div>
               <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
-                <span className="text-xs text-text-secondary">Overall Success Rate</span>
+                <span className="text-xs text-text-secondary">Tasa de Éxito General</span>
                 <span className="text-sm font-bold text-green-600">{mockDashboardStats.successRate}%</span>
               </div>
             </CardBody>
@@ -486,8 +499,8 @@ export default function AdminAnalyticsPage() {
           <Card variant="elevated">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>API Usage</CardTitle>
-                <Badge status="info" size="sm">{formatNumber(totalApiCalls)} calls</Badge>
+                <CardTitle>Uso de API</CardTitle>
+                <Badge status="info" size="sm">{formatNumber(totalApiCalls)} llamadas</Badge>
               </div>
             </CardHeader>
             <CardBody>
@@ -506,7 +519,7 @@ export default function AdminAnalyticsPage() {
                         }}
                       />
                       <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[9px] px-1.5 py-0.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                        {new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}: {formatNumber(d.apiCalls)}
+                        {new Date(d.date).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' })}: {formatNumber(d.apiCalls)}
                       </div>
                     </div>
                   );
@@ -514,19 +527,19 @@ export default function AdminAnalyticsPage() {
               </div>
               <div className="mt-4 space-y-3 pt-3 border-t border-gray-100">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-text-secondary">Avg per day</span>
+                  <span className="text-text-secondary">Promedio por día</span>
                   <span className="font-semibold text-text-primary">{formatNumber(Math.round(totalApiCalls / rangeData.length))}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-text-secondary">Peak day</span>
+                  <span className="text-text-secondary">Día pico</span>
                   <span className="font-semibold text-text-primary">{formatNumber(Math.max(...rangeData.map((d) => d.apiCalls)))}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-text-secondary">Avg response time</span>
+                  <span className="text-text-secondary">Tiempo de respuesta promedio</span>
                   <span className="font-semibold text-text-primary">124ms</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-text-secondary">Error rate</span>
+                  <span className="text-text-secondary">Tasa de error</span>
                   <span className="font-semibold text-green-600">0.12%</span>
                 </div>
               </div>
@@ -539,20 +552,20 @@ export default function AdminAnalyticsPage() {
           <CardBody>
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
-                <h3 className="text-sm font-semibold text-text-primary">Export Reports</h3>
+                <h3 className="text-sm font-semibold text-text-primary">Exportar Reportes</h3>
                 <p className="text-xs text-text-secondary mt-0.5">
-                  Generate downloadable reports in CSV or PDF format
+                  Generar reportes descargables en formato CSV o PDF
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" leftIcon={Download}>
-                  Export CSV
+                  Exportar CSV
                 </Button>
                 <Button variant="outline" size="sm" leftIcon={Download}>
-                  Export PDF
+                  Exportar PDF
                 </Button>
                 <Button variant="primary" size="sm" leftIcon={BarChart3}>
-                  Full Report
+                  Reporte Completo
                 </Button>
               </div>
             </div>

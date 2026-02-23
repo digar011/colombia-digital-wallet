@@ -186,10 +186,10 @@ export default function AdminDashboardPage() {
         {/* ── Header ──────────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-text-primary">Admin Dashboard</h1>
+            <h1 className="text-2xl font-bold text-text-primary">Panel Administrativo</h1>
             <p className="text-sm text-text-secondary mt-1">
-              Colombia Digital Wallet — Overview &middot; Last updated{' '}
-              {lastRefresh.toLocaleTimeString('en-US', {
+              Billetera Digital Colombia — Resumen &middot; Última actualización{' '}
+              {lastRefresh.toLocaleTimeString('es-CO', {
                 hour: '2-digit',
                 minute: '2-digit',
               })}
@@ -201,40 +201,40 @@ export default function AdminDashboardPage() {
             leftIcon={RefreshCw}
             onClick={handleRefresh}
           >
-            Refresh
+            Actualizar
           </Button>
         </div>
 
         {/* ── Stats Cards ─────────────────────────────────────────── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
-            title="Total Citizens"
+            title="Total Ciudadanos"
             value={mockDashboardStats.totalCitizens}
-            subtitle={`${formatNumber(mockDashboardStats.newRegistrationsToday)} new today`}
+            subtitle={`${formatNumber(mockDashboardStats.newRegistrationsToday)} nuevos hoy`}
             icon={<Users className="w-6 h-6 text-colombia-blue" />}
             trend={{ value: 5.2, isPositive: true }}
             color="bg-colombia-blue"
           />
           <StatsCard
-            title="Active Documents"
+            title="Documentos Activos"
             value={mockDashboardStats.activeDocuments}
-            subtitle={`${formatNumber(mockDashboardStats.documentsIssuedToday)} issued today`}
+            subtitle={`${formatNumber(mockDashboardStats.documentsIssuedToday)} emitidos hoy`}
             icon={<FileText className="w-6 h-6 text-colombia-yellow-dark" />}
             trend={{ value: 3.8, isPositive: true }}
             color="bg-colombia-yellow"
           />
           <StatsCard
-            title="Verifications Today"
+            title="Verificaciones Hoy"
             value={mockDashboardStats.verificationsToday}
-            subtitle={`${mockDashboardStats.successRate}% success rate`}
+            subtitle={`${mockDashboardStats.successRate}% tasa de éxito`}
             icon={<ShieldCheck className="w-6 h-6 text-green-600" />}
             trend={{ value: 1.4, isPositive: true }}
             color="bg-green-500"
           />
           <StatsCard
-            title="Pending Requests"
+            title="Solicitudes Pendientes"
             value={mockDashboardStats.pendingRequests}
-            subtitle={`${mockDashboardStats.pendingVerifications} verifications pending`}
+            subtitle={`${mockDashboardStats.pendingVerifications} verificaciones pendientes`}
             icon={<Clock className="w-6 h-6 text-yellow-600" />}
             trend={{ value: 2.1, isPositive: false }}
             color="bg-yellow-500"
@@ -247,9 +247,9 @@ export default function AdminDashboardPage() {
           <Card variant="elevated" className="lg:col-span-2">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Registration Trend (Last 7 Days)</CardTitle>
+                <CardTitle>Tendencia de Registros (Últimos 7 Días)</CardTitle>
                 <Badge status="info" size="sm">
-                  {formatNumber(mockDashboardStats.newRegistrationsThisWeek)} this week
+                  {formatNumber(mockDashboardStats.newRegistrationsThisWeek)} esta semana
                 </Badge>
               </div>
             </CardHeader>
@@ -260,7 +260,7 @@ export default function AdminDashboardPage() {
                     (day.registrations / maxRegistrations) * 100,
                     8
                   );
-                  const dateLabel = new Date(day.date).toLocaleDateString('en-US', {
+                  const dateLabel = new Date(day.date).toLocaleDateString('es-CO', {
                     weekday: 'short',
                   });
                   return (
@@ -292,15 +292,15 @@ export default function AdminDashboardPage() {
               </div>
               <div className="mt-4 flex items-center justify-between text-xs text-text-secondary border-t border-gray-100 pt-3">
                 <span>
-                  Avg: {Math.round(last7Days.reduce((s, d) => s + d.registrations, 0) / 7)}/day
+                  Prom: {Math.round(last7Days.reduce((s, d) => s + d.registrations, 0) / 7)}/día
                 </span>
                 <span>
-                  Peak:{' '}
+                  Pico:{' '}
                   {new Date(
                     last7Days.reduce((best, d) =>
                       d.registrations > best.registrations ? d : best
                     ).date
-                  ).toLocaleDateString('en-US', { weekday: 'long' })}
+                  ).toLocaleDateString('es-CO', { weekday: 'long' })}
                 </span>
               </div>
             </CardBody>
@@ -309,7 +309,7 @@ export default function AdminDashboardPage() {
           {/* Document Type Distribution (Pie Chart) */}
           <Card variant="elevated">
             <CardHeader>
-              <CardTitle>Document Types</CardTitle>
+              <CardTitle>Tipos de Documento</CardTitle>
             </CardHeader>
             <CardBody>
               {/* CSS pie chart */}
@@ -376,9 +376,9 @@ export default function AdminDashboardPage() {
           <Card variant="elevated" className="lg:col-span-2">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Recent Activity</CardTitle>
+                <CardTitle>Actividad Reciente</CardTitle>
                 <Button variant="ghost" size="sm" rightIcon={ArrowRight}>
-                  View All
+                  Ver Todo
                 </Button>
               </div>
             </CardHeader>
@@ -431,7 +431,7 @@ export default function AdminDashboardPage() {
             {/* Quick Actions */}
             <Card variant="elevated">
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
+                <CardTitle>Acciones Rápidas</CardTitle>
               </CardHeader>
               <CardBody>
                 <div className="space-y-2">
@@ -440,8 +440,8 @@ export default function AdminDashboardPage() {
                       <FilePlus className="w-5 h-5" />
                     </div>
                     <div className="text-left flex-1">
-                      <p className="text-sm font-semibold text-text-primary">Issue Document</p>
-                      <p className="text-xs text-text-secondary">Create and issue a new document</p>
+                      <p className="text-sm font-semibold text-text-primary">Emitir Documento</p>
+                      <p className="text-xs text-text-secondary">Crear y emitir un nuevo documento</p>
                     </div>
                     <ChevronRight className="w-4 h-4 text-gray-400" />
                   </button>
@@ -451,9 +451,9 @@ export default function AdminDashboardPage() {
                       <UserCheck className="w-5 h-5" />
                     </div>
                     <div className="text-left flex-1">
-                      <p className="text-sm font-semibold text-text-primary">Verify Citizen</p>
+                      <p className="text-sm font-semibold text-text-primary">Verificar Ciudadano</p>
                       <p className="text-xs text-text-secondary">
-                        {mockDashboardStats.pendingVerifications} pending verifications
+                        {mockDashboardStats.pendingVerifications} verificaciones pendientes
                       </p>
                     </div>
                     <ChevronRight className="w-4 h-4 text-gray-400" />
@@ -464,8 +464,8 @@ export default function AdminDashboardPage() {
                       <BarChart3 className="w-5 h-5" />
                     </div>
                     <div className="text-left flex-1">
-                      <p className="text-sm font-semibold text-text-primary">View Reports</p>
-                      <p className="text-xs text-text-secondary">Analytics & export data</p>
+                      <p className="text-sm font-semibold text-text-primary">Ver Reportes</p>
+                      <p className="text-xs text-text-secondary">Analítica y exportar datos</p>
                     </div>
                     <ChevronRight className="w-4 h-4 text-gray-400" />
                   </button>
@@ -477,7 +477,7 @@ export default function AdminDashboardPage() {
             <Card variant="elevated">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>System Status</CardTitle>
+                  <CardTitle>Estado del Sistema</CardTitle>
                   <div className="flex items-center gap-1.5">
                     {mockSystemHealth.every((s) => s.status === 'operational') ? (
                       <CheckCircle2 className="w-4 h-4 text-green-500" />
@@ -488,7 +488,7 @@ export default function AdminDashboardPage() {
                     )}
                     <span className="text-xs font-medium text-text-secondary">
                       {mockSystemHealth.filter((s) => s.status === 'operational').length}/
-                      {mockSystemHealth.length} Operational
+                      {mockSystemHealth.length} Operativo
                     </span>
                   </div>
                 </div>
@@ -525,7 +525,7 @@ export default function AdminDashboardPage() {
             <div className="flex items-center gap-3">
               <Activity className="w-5 h-5 text-colombia-blue" />
               <div>
-                <p className="text-xs text-text-secondary">Avg Verification Time</p>
+                <p className="text-xs text-text-secondary">Tiempo Promedio de Verificación</p>
                 <p className="text-lg font-bold text-text-primary">
                   {mockDashboardStats.averageVerificationTime}
                 </p>
@@ -536,10 +536,10 @@ export default function AdminDashboardPage() {
             <div className="flex items-center gap-3">
               <TrendingUp className="w-5 h-5 text-green-600" />
               <div>
-                <p className="text-xs text-text-secondary">This Week</p>
+                <p className="text-xs text-text-secondary">Esta Semana</p>
                 <p className="text-lg font-bold text-text-primary">
                   {formatNumber(mockDashboardStats.verificationsThisWeek)}
-                  <span className="text-xs font-normal text-text-secondary ml-1">verifications</span>
+                  <span className="text-xs font-normal text-text-secondary ml-1">verificaciones</span>
                 </p>
               </div>
             </div>
@@ -548,7 +548,7 @@ export default function AdminDashboardPage() {
             <div className="flex items-center gap-3">
               <FileText className="w-5 h-5 text-colombia-yellow-dark" />
               <div>
-                <p className="text-xs text-text-secondary">Documents This Week</p>
+                <p className="text-xs text-text-secondary">Documentos Esta Semana</p>
                 <p className="text-lg font-bold text-text-primary">
                   {formatNumber(mockDashboardStats.documentsIssuedThisWeek)}
                 </p>
@@ -559,7 +559,7 @@ export default function AdminDashboardPage() {
             <div className="flex items-center gap-3">
               <XCircle className="w-5 h-5 text-colombia-red" />
               <div>
-                <p className="text-xs text-text-secondary">Rejected Today</p>
+                <p className="text-xs text-text-secondary">Rechazados Hoy</p>
                 <p className="text-lg font-bold text-text-primary">
                   {mockDashboardStats.rejectedToday}
                 </p>

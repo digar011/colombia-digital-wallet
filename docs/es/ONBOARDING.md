@@ -11,11 +11,12 @@ Bienvenido al proyecto Mi Colombia Digital! Esta guia te llevara paso a paso por
 5. [Convenciones del Proyecto](#convenciones-del-proyecto)
 6. [Datos de Prueba (Mock Data)](#datos-de-prueba-mock-data)
 7. [Sistema Multi-Pais](#sistema-multi-pais)
-8. [Base de Datos y Supabase](#base-de-datos-y-supabase)
-9. [Guia de Pruebas (Testing)](#guia-de-pruebas-testing)
-10. [Despliegue](#despliegue)
-11. [Tareas Comunes](#tareas-comunes)
-12. [Solucion de Problemas](#solucion-de-problemas)
+8. [Portal de Agencias](#portal-de-agencias)
+9. [Base de Datos y Supabase](#base-de-datos-y-supabase)
+10. [Guia de Pruebas (Testing)](#guia-de-pruebas-testing)
+11. [Despliegue](#despliegue)
+12. [Tareas Comunes](#tareas-comunes)
+13. [Solucion de Problemas](#solucion-de-problemas)
 
 ---
 
@@ -27,6 +28,7 @@ Bienvenido al proyecto Mi Colombia Digital! Esta guia te llevara paso a paso por
 
 - Una **aplicacion movil web para ciudadanos** (interfaz en espanol) donde los usuarios ven sus documentos digitales
 - Un **panel de administracion gubernamental** para gestionar ciudadanos y emitir documentos
+- Un **portal de agencias** para que los funcionarios de agencias gubernamentales gestionen documentos, ciudadanos y solicitudes de verificacion
 - Un **framework multi-pais** para que la misma plataforma se pueda desplegar en Ecuador, Guatemala, etc.
 - Un **sistema con capacidad offline** donde los documentos esenciales funcionan sin internet
 
@@ -36,6 +38,7 @@ Bienvenido al proyecto Mi Colombia Digital! Esta guia te llevara paso a paso por
 |-----------------|----------|
 | **Ciudadanos** | Ver cedula digital, registro vehicular, carnet de salud, verificacion QR |
 | **Funcionarios** | Escanear codigos QR para verificar documentos ciudadanos |
+| **Funcionarios de Agencia** | Gestionar documentos de la agencia, consultar ciudadanos, manejar solicitudes de verificacion |
 | **Operadores Admin** | Emitir documentos, gestionar ciudadanos, ver analiticas |
 
 ---
@@ -106,6 +109,7 @@ La app usa grupos de rutas de Next.js para separar layouts:
 (auth)/     → Login, Registro, Verificacion — layout minimo
 (citizen)/  → App ciudadana — barra de navegacion inferior + encabezado
 (admin)/    → Panel de administracion — barra lateral + barra superior
+(agency)/   → Portal de agencias — AgencySidebar + AgencyHeader
 ```
 
 ### Directorios Clave
@@ -115,10 +119,10 @@ La app usa grupos de rutas de Next.js para separar layouts:
 | `src/app/` | Paginas y rutas API (Next.js App Router) |
 | `src/components/ui/` | Componentes UI reutilizables (Button, Card, Input, etc.) |
 | `src/components/documents/` | Componentes de tarjetas de documentos (Cedula, Vehiculo, Salud) |
-| `src/components/layout/` | Componentes de layout (BottomNav, Header, Sidebar) |
+| `src/components/layout/` | Componentes de layout (BottomNav, Header, Sidebar, AgencySidebar, AgencyHeader) |
 | `src/config/countries/` | Configuraciones JSON por pais |
 | `src/lib/contexts/` | Proveedores de Context React (Auth, Country) |
-| `src/lib/mock/` | Datos de prueba para desarrollo |
+| `src/lib/mock/` | Datos de prueba para desarrollo (citizenData, adminData, agencyData) |
 | `src/lib/supabase/` | Configuracion del cliente Supabase |
 | `supabase/migrations/` | Migraciones SQL de base de datos |
 | `tests/e2e/` | Archivos de pruebas E2E con Playwright |
@@ -269,7 +273,68 @@ El componente `CountrySwitcher` (en modo admin/demo) actualiza el contexto de pa
 
 ---
 
-## 8. Base de Datos y Supabase
+## 8. Portal de Agencias
+
+El Portal de Agencias es una interfaz dedicada para los funcionarios de agencias gubernamentales. Soporta 3 paises (Colombia, Ecuador, Guatemala) con 6 agencias por pais.
+
+### Acceder al Portal de Agencias
+
+Navegar a `/agency` para ver el portal de seleccion de agencias, que muestra 6 tarjetas de agencias. Cada tarjeta representa una agencia gubernamental (ej: RNEC, RUNT, DIAN). Los funcionarios inician sesion en `/agency/login` con sus credenciales institucionales (email `.gov.co`).
+
+### Rutas de Agencia
+
+| Ruta | Descripcion |
+|------|-------------|
+| `/agency` | Portal de seleccion de agencias (6 tarjetas) |
+| `/agency/login` | Inicio de sesion con email institucional |
+| `/agency/[agencyKey]/dashboard` | Panel de la agencia con metricas clave |
+| `/agency/[agencyKey]/documents` | Gestion de documentos (emitidos por la agencia) |
+| `/agency/[agencyKey]/citizens` | Consulta y busqueda de ciudadanos |
+| `/agency/[agencyKey]/requests` | Solicitudes de verificacion (aprobar/rechazar) |
+| `/agency/[agencyKey]/analytics` | Analiticas especificas de la agencia |
+| `/agency/[agencyKey]/settings` | Configuracion de la agencia |
+
+**Claves de Agencia:** `identity`, `vehicles`, `tax`, `health`, `socialServices`, `technology`
+
+### Agencias Soportadas por Pais
+
+| Pais | Agencias |
+|------|----------|
+| **Colombia** | RNEC (Identidad), RUNT (Vehiculos), DIAN (Tributario), ADRES (Salud), DPS (Servicios Sociales), MinTIC (Tecnologia) |
+| **Ecuador** | Registro Civil, ANT, SRI, IESS, MIES, MINTEL |
+| **Guatemala** | RENAP, SAT-Vehiculos, SAT, IGSS, MIDES, CIV |
+
+### Funcionalidades del Portal de Agencias
+
+- **Selector en barra lateral** — Cambiar entre agencias sin cerrar sesion
+- **Gestion de documentos** — Ver, emitir y revocar documentos del dominio de la agencia
+- **Consulta de ciudadanos** — Buscar ciudadanos por numero de cedula, nombre u otros identificadores
+- **Solicitudes de verificacion** — Cola de solicitudes pendientes que los funcionarios pueden aprobar o rechazar
+- **Panel de analiticas** — Metricas especificas de la agencia (documentos emitidos, verificaciones, tendencias)
+- **Configuracion** — Configurar parametros de la agencia, notificaciones y acceso de funcionarios
+
+### Archivos Clave
+
+| Archivo | Proposito |
+|---------|-----------|
+| `src/app/(agency)/layout.tsx` | Layout de agencia con AgencySidebar y AgencyHeader |
+| `src/app/(agency)/agency/page.tsx` | Portal de seleccion de agencias |
+| `src/app/(agency)/agency/login/page.tsx` | Pagina de inicio de sesion para funcionarios |
+| `src/app/(agency)/agency/[agencyKey]/page.tsx` | Raiz de agencia (redirige al dashboard) |
+| `src/app/(agency)/agency/[agencyKey]/dashboard/page.tsx` | Panel de la agencia |
+| `src/app/(agency)/agency/[agencyKey]/documents/page.tsx` | Gestion de documentos |
+| `src/app/(agency)/agency/[agencyKey]/citizens/page.tsx` | Consulta de ciudadanos |
+| `src/app/(agency)/agency/[agencyKey]/requests/page.tsx` | Solicitudes de verificacion |
+| `src/app/(agency)/agency/[agencyKey]/analytics/page.tsx` | Analiticas |
+| `src/app/(agency)/agency/[agencyKey]/settings/page.tsx` | Configuracion |
+| `src/components/layout/AgencySidebar.tsx` | Barra lateral de agencia con selector desplegable |
+| `src/components/layout/AgencyHeader.tsx` | Barra de encabezado de agencia |
+| `src/lib/mock/agencyData.ts` | Datos mock para todas las agencias en 3 paises |
+| `tests/e2e/agency/agency.spec.ts` | Pruebas E2E del portal de agencias |
+
+---
+
+## 9. Base de Datos y Supabase
 
 ### Desarrollo Local
 
@@ -304,7 +369,7 @@ Los archivos de migracion SQL estan en `supabase/migrations/`:
 
 ---
 
-## 9. Guia de Pruebas (Testing)
+## 10. Guia de Pruebas (Testing)
 
 ### Ejecutar Pruebas
 
@@ -316,6 +381,7 @@ npm run test:e2e
 npx playwright test tests/e2e/auth/
 npx playwright test tests/e2e/citizen/
 npx playwright test tests/e2e/admin/
+npx playwright test tests/e2e/agency/
 
 # Modo UI interactivo
 npx playwright test --ui
@@ -346,11 +412,12 @@ auth.spec.ts               — Flujos de autenticacion
 citizen-dashboard.spec.ts  — Panel del ciudadano
 citizen-documents.spec.ts  — Visualizacion de documentos
 admin-dashboard.spec.ts    — Panel de administracion
+agency.spec.ts             — Portal de agencias
 ```
 
 ---
 
-## 10. Despliegue
+## 11. Despliegue
 
 ### Vercel (Recomendado)
 
@@ -370,7 +437,7 @@ admin-dashboard.spec.ts    — Panel de administracion
 
 ---
 
-## 11. Tareas Comunes
+## 12. Tareas Comunes
 
 ### Agregar un nuevo tipo de documento
 
@@ -397,7 +464,7 @@ admin-dashboard.spec.ts    — Panel de administracion
 
 ---
 
-## 12. Solucion de Problemas
+## 13. Solucion de Problemas
 
 ### Problemas Comunes
 

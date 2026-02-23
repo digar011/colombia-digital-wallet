@@ -24,7 +24,20 @@ import {
   formatColombianDate,
 } from '@/lib/mock/citizenData';
 
-// ─── Digital Cedula Page ─────────────────────────────────────────────────────
+// ─── Age calculation helper ─────────────────────────────────────────────────
+
+function calculateAge(dateOfBirth: string): number {
+  const today = new Date();
+  const birth = new Date(dateOfBirth);
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+// ─── Digital Identity Document Page ─────────────────────────────────────────
 
 export default function IdentityPage() {
   const router = useRouter();
@@ -32,6 +45,12 @@ export default function IdentityPage() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const citizenAge = calculateAge(mockCitizen.dateOfBirth);
+  const isMinor = citizenAge < 18;
+  const documentTitle = isMinor ? 'Tarjeta de Identidad' : 'Cedula de Ciudadania';
+  const documentShort = isMinor ? 'TI' : 'CC';
+  const documentPrefix = isMinor ? 'TI' : 'CC';
 
   const cedulaDoc = mockDocuments.find((d) => d.type === 'identity');
 
@@ -52,7 +71,7 @@ export default function IdentityPage() {
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-colombia-blue" />
           <p className="text-sm text-text-secondary dark:text-text-secondary-dark">
-            Cargando cedula digital...
+            Cargando documento digital...
           </p>
         </div>
       </div>
@@ -80,9 +99,9 @@ export default function IdentityPage() {
 
         <div className="w-full max-w-md">
           {!isFlipped ? (
-            <CedulaFront fullscreen />
+            <CedulaFront fullscreen isMinor={isMinor} documentTitle={documentTitle} documentShort={documentShort} />
           ) : (
-            <CedulaBack fullscreen />
+            <CedulaBack fullscreen isMinor={isMinor} />
           )}
         </div>
       </div>
@@ -102,7 +121,7 @@ export default function IdentityPage() {
           </button>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-text-primary dark:text-text-primary-dark">
-              Cedula de Ciudadania
+              {documentTitle}
             </h1>
             <p className="text-xs text-text-secondary dark:text-text-secondary-dark">
               Documento digital verificado
@@ -129,7 +148,7 @@ export default function IdentityPage() {
               style={{ backfaceVisibility: 'hidden' }}
               className={isFlipped ? 'invisible absolute inset-0' : ''}
             >
-              <CedulaFront />
+              <CedulaFront isMinor={isMinor} documentTitle={documentTitle} documentShort={documentShort} />
             </div>
 
             {/* Back */}
@@ -140,7 +159,7 @@ export default function IdentityPage() {
               }}
               className={!isFlipped ? 'invisible absolute inset-0' : ''}
             >
-              <CedulaBack />
+              <CedulaBack isMinor={isMinor} />
             </div>
           </div>
         </div>
@@ -198,7 +217,7 @@ export default function IdentityPage() {
               <InfoRow label="Nombre Completo" value={mockCitizen.fullName} />
               <InfoRow
                 label="Numero de Documento"
-                value={`CC ${mockCitizen.documentNumber}`}
+                value={`${documentPrefix} ${mockCitizen.documentNumber}`}
                 copyable
                 onCopy={handleCopy}
                 isCopied={copied}
@@ -268,26 +287,26 @@ export default function IdentityPage() {
 
 // ─── Cedula Front Component ──────────────────────────────────────────────────
 
-function CedulaFront({ fullscreen = false }: { fullscreen?: boolean }) {
+function CedulaFront({ fullscreen = false, isMinor = false, documentTitle = 'Cedula de Ciudadania', documentShort = 'CC' }: { fullscreen?: boolean; isMinor?: boolean; documentTitle?: string; documentShort?: string }) {
   return (
     <div
-      className={`bg-gradient-to-br from-colombia-blue via-colombia-blue to-colombia-blue-dark rounded-2xl overflow-hidden shadow-xl ${
+      className={`bg-gradient-to-br ${isMinor ? 'from-emerald-700 via-emerald-600 to-emerald-800' : 'from-colombia-blue via-colombia-blue to-colombia-blue-dark'} rounded-2xl overflow-hidden shadow-xl ${
         fullscreen ? 'p-6' : 'p-5'
       }`}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-colombia-yellow text-[10px] font-semibold uppercase tracking-[0.2em]">
+          <p className={`${isMinor ? 'text-emerald-200' : 'text-colombia-yellow'} text-[10px] font-semibold uppercase tracking-[0.2em]`}>
             Republica de Colombia
           </p>
           <p className="text-white text-xs font-bold mt-0.5">
-            Cedula de Ciudadania
+            {documentTitle}
           </p>
         </div>
         {/* Coat of Arms placeholder */}
-        <div className="w-10 h-10 rounded-full bg-colombia-yellow/20 flex items-center justify-center border border-colombia-yellow/30">
-          <span className="text-colombia-yellow text-lg">CO</span>
+        <div className={`w-10 h-10 rounded-full ${isMinor ? 'bg-emerald-200/20 border-emerald-200/30' : 'bg-colombia-yellow/20 border-colombia-yellow/30'} flex items-center justify-center border`}>
+          <span className={`${isMinor ? 'text-emerald-200' : 'text-colombia-yellow'} text-lg`}>{documentShort}</span>
         </div>
       </div>
 
@@ -324,7 +343,7 @@ function CedulaFront({ fullscreen = false }: { fullscreen?: boolean }) {
               <p className="text-white/60 text-[8px] uppercase tracking-wider">
                 Numero
               </p>
-              <p className="text-colombia-yellow text-sm font-bold tracking-wider">
+              <p className={`${isMinor ? 'text-emerald-200' : 'text-colombia-yellow'} text-sm font-bold tracking-wider`}>
                 {mockCitizen.documentNumber}
               </p>
             </div>
@@ -365,18 +384,18 @@ function CedulaFront({ fullscreen = false }: { fullscreen?: boolean }) {
 
 // ─── Cedula Back Component ───────────────────────────────────────────────────
 
-function CedulaBack({ fullscreen = false }: { fullscreen?: boolean }) {
+function CedulaBack({ fullscreen = false, isMinor = false }: { fullscreen?: boolean; isMinor?: boolean }) {
   const cedulaDoc = mockDocuments.find((d) => d.type === 'identity');
 
   return (
     <div
-      className={`bg-gradient-to-br from-colombia-blue-dark via-colombia-blue to-colombia-blue rounded-2xl overflow-hidden shadow-xl ${
+      className={`bg-gradient-to-br ${isMinor ? 'from-emerald-800 via-emerald-700 to-emerald-600' : 'from-colombia-blue-dark via-colombia-blue to-colombia-blue'} rounded-2xl overflow-hidden shadow-xl ${
         fullscreen ? 'p-6' : 'p-5'
       }`}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <p className="text-colombia-yellow text-[10px] font-semibold uppercase tracking-[0.2em]">
+        <p className={`${isMinor ? 'text-emerald-200' : 'text-colombia-yellow'} text-[10px] font-semibold uppercase tracking-[0.2em]`}>
           Republica de Colombia
         </p>
         <p className="text-white/60 text-[9px]">RESPALDO</p>
@@ -426,7 +445,7 @@ function CedulaBack({ fullscreen = false }: { fullscreen?: boolean }) {
             <p className="text-white/60 text-[8px] uppercase tracking-wider">
               Firma Digital
             </p>
-            <p className="text-colombia-yellow text-[9px] font-mono tracking-wider mt-0.5">
+            <p className={`${isMinor ? 'text-emerald-200' : 'text-colombia-yellow'} text-[9px] font-mono tracking-wider mt-0.5`}>
               DSig:A3F8...K92B
             </p>
           </div>
@@ -434,7 +453,7 @@ function CedulaBack({ fullscreen = false }: { fullscreen?: boolean }) {
             <p className="text-white/60 text-[8px] uppercase tracking-wider">
               Huella Digital
             </p>
-            <Fingerprint size={18} className="text-colombia-yellow ml-auto mt-0.5" />
+            <Fingerprint size={18} className={`${isMinor ? 'text-emerald-200' : 'text-colombia-yellow'} ml-auto mt-0.5`} />
           </div>
         </div>
       </div>
@@ -442,7 +461,7 @@ function CedulaBack({ fullscreen = false }: { fullscreen?: boolean }) {
       {/* Machine-readable zone */}
       <div className="mt-3 pt-2 border-t border-white/10">
         <p className="text-white/30 text-[7px] font-mono tracking-[0.15em] leading-relaxed">
-          IDCOL{mockCitizen.documentNumber}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+          {isMinor ? 'TICOL' : 'IDCOL'}{mockCitizen.documentNumber}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
           <br />
           {mockCitizen.dateOfBirth.replace(/-/g, '')}M{mockCitizen.firstLastName.toUpperCase()}&lt;&lt;{mockCitizen.firstName.toUpperCase()}
         </p>

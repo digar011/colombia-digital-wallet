@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Routes that do NOT require authentication
+// Routes that do NOT require citizen authentication
 const PUBLIC_PATHS = ['/login', '/register', '/verify', '/'];
+
+// Agency routes that are publicly accessible (portal + login)
+const AGENCY_PUBLIC_PATHS = ['/agency', '/agency/login'];
 
 // API routes are always allowed through
 const API_PREFIX = '/api';
@@ -11,6 +14,16 @@ function isPublicPath(pathname: string): boolean {
   if (pathname === '/') return true;
   return PUBLIC_PATHS.some(
     (p) => pathname === p || pathname.startsWith(`${p}/`)
+  );
+}
+
+function isAgencyPath(pathname: string): boolean {
+  return pathname.startsWith('/agency');
+}
+
+function isAgencyPublicPath(pathname: string): boolean {
+  return AGENCY_PUBLIC_PATHS.some(
+    (p) => pathname === p || pathname.startsWith(`${p}?`)
   );
 }
 
@@ -31,7 +44,24 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for auth token in cookie (set by the client-side auth hook)
+  // ─── Agency routes: separate auth flow ─────────────────────────────────
+  if (isAgencyPath(pathname)) {
+    // Agency portal and login pages are always accessible
+    if (isAgencyPublicPath(pathname)) {
+      return NextResponse.next();
+    }
+
+    // Protected agency pages require agency-token cookie
+    const agencyToken = request.cookies.get('agency-token')?.value;
+    if (!agencyToken) {
+      const loginUrl = new URL('/agency/login', request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    return NextResponse.next();
+  }
+
+  // ─── Citizen routes: standard auth flow ───────────────────────────────
   const authToken = request.cookies.get('auth-token')?.value;
   const isAuthenticated = !!authToken;
   const isPublic = isPublicPath(pathname);
