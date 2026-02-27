@@ -38,11 +38,36 @@ function Modal({
 }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
+        return;
+      }
+
+      // Focus trap: cycle focus within the modal
+      if (e.key === 'Tab' && contentRef.current) {
+        const focusable = contentRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       }
     },
     [onClose]
@@ -50,6 +75,8 @@ function Modal({
 
   useEffect(() => {
     if (isOpen) {
+      // Remember the element that triggered the modal
+      triggerRef.current = document.activeElement as HTMLElement;
       document.addEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'hidden';
       // Focus the content on open for accessibility
@@ -60,6 +87,14 @@ function Modal({
       document.body.style.overflow = '';
     };
   }, [isOpen, handleKeyDown]);
+
+  // Return focus to the trigger element when modal closes
+  useEffect(() => {
+    if (!isOpen && triggerRef.current) {
+      triggerRef.current.focus();
+      triggerRef.current = null;
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -119,7 +154,7 @@ function Modal({
                   'text-text-secondary hover:text-text-primary hover:bg-gray-100',
                   'dark:text-text-secondary-dark dark:hover:text-text-primary-dark dark:hover:bg-gray-700'
                 )}
-                aria-label="Close modal"
+                aria-label="Cerrar modal"
               >
                 <X size={20} />
               </button>

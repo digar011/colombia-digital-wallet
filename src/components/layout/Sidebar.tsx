@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Shield,
+  Ticket,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
@@ -44,6 +45,12 @@ const navItems: NavItem[] = [
     href: '/admin/documents',
     icon: FileText,
     matchPrefix: '/admin/documents',
+  },
+  {
+    label: 'Tickets',
+    href: '/admin/tickets',
+    icon: Ticket,
+    matchPrefix: '/admin/tickets',
   },
   {
     label: 'Analítica',
@@ -119,7 +126,7 @@ export function Sidebar({ role = 'admin', className }: SidebarProps) {
       </div>
 
       {/* Navigation links */}
-      <nav className="flex-1 py-4 px-3 overflow-y-auto no-scrollbar">
+      <nav aria-label="Menu de administracion" className="flex-1 py-4 px-3 overflow-y-auto no-scrollbar">
         <ul className="space-y-1">
           {navItems.map((item) => {
             const isActive =
@@ -142,6 +149,7 @@ export function Sidebar({ role = 'admin', className }: SidebarProps) {
                       ? 'bg-colombia-blue/10 dark:bg-colombia-yellow/10 text-colombia-blue dark:text-colombia-yellow font-medium'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200'
                   )}
+                  aria-current={isActive ? 'page' : undefined}
                   title={isCollapsed ? item.label : undefined}
                 >
                   {/* Active indicator */}

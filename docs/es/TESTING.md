@@ -45,23 +45,19 @@ npx playwright show-report
 tests/
 └── e2e/
     ├── auth/
-    │   └── auth.spec.ts           # Flujos de login, registro, logout, verificacion
+    │   └── auth.spec.ts              # Flujos de login, registro, verificacion
     ├── citizen/
-    │   ├── dashboard.spec.ts      # Renderizado del panel, navegacion
-    │   ├── documents.spec.ts      # Visualizacion de documentos, interacciones con tarjetas
-    │   ├── identity.spec.ts       # Pruebas especificas de Cedula Digital
-    │   ├── vehicles.spec.ts       # Tarjetas de vehiculos, estado SOAT
-    │   ├── health.spec.ts         # Registros de salud, vacunaciones
-    │   ├── services.spec.ts       # Programas sociales, citas
-    │   ├── emergency.spec.ts      # Contactos de emergencia, botones de llamada
-    │   └── profile.spec.ts        # Pagina de perfil, configuracion
+    │   ├── dashboard.spec.ts         # Renderizado del panel, navegacion
+    │   ├── documents.spec.ts         # Visualizacion de documentos, interacciones con tarjetas
+    │   ├── services.spec.ts          # Programas sociales, citas
+    │   ├── emergency.spec.ts         # Contactos de emergencia, botones de llamada
+    │   └── profile.spec.ts           # Pagina de perfil, configuracion
     ├── admin/
-    │   ├── dashboard.spec.ts      # Estadisticas del panel admin
-    │   ├── users.spec.ts          # Gestion de ciudadanos
-    │   ├── documents.spec.ts      # Emision de documentos
-    │   └── analytics.spec.ts      # Vistas de analiticas
+    │   └── admin-dashboard.spec.ts   # Estadisticas y gestion del panel admin
+    ├── agency/
+    │   └── agency.spec.ts            # Portal de agencias: seleccion, login, navegacion
     └── config/
-        └── country-switch.spec.ts # Cambio de pais multi-pais
+        └── country-switch.spec.ts    # Cambio de pais multi-pais
 ```
 
 ## Escribir Pruebas
@@ -126,8 +122,7 @@ await expect(page.getByTestId('insignia')).toHaveAttribute('data-status', 'activ
 La configuracion de Playwright esta en `playwright.config.ts`:
 
 - **URL Base**: `http://localhost:3000`
-- **Navegadores**: Chromium, Firefox, WebKit
-- **Movil**: Viewports de iPhone 12, Pixel 5
+- **Proyectos**: chromium-desktop, mobile-chrome (Pixel 5), mobile-safari (iPhone 12)
 - **Timeouts**: 30s por prueba, 5s por accion
 - **Reintentos**: 1 en CI, 0 localmente
 - **Capturas de pantalla**: Solo en fallas

@@ -18,13 +18,13 @@
 ┌─────────────────────────────────────────────────┐
 │              NEXT.JS APPLICATION                 │
 │                                                  │
-│  ┌──────────┐  ┌──────────┐  ┌────────────────┐│
-│  │ (auth)/   │  │(citizen)/│  │   (admin)/     ││
-│  │ Routes    │  │ Routes   │  │   Routes       ││
-│  └──────────┘  └──────────┘  └────────────────┘│
+│  ┌────────┐ ┌────────┐ ┌────────┐ ┌──────────┐ │
+│  │(auth)/ │ │(citiz.)│ │(admin)/│ │(agency)/ │ │
+│  │Routes  │ │Routes  │ │Routes  │ │Routes    │ │
+│  └────────┘ └────────┘ └────────┘ └──────────┘ │
 │                                                  │
 │  ┌──────────────────────────────────────────┐   │
-│  │           API Routes (/api/)             │   │
+│  │      Supabase Client (direct calls)      │   │
 │  └──────────────────┬───────────────────────┘   │
 └─────────────────────┼───────────────────────────┘
                       │
@@ -63,14 +63,27 @@ App
 │   │   │   │   │   ├── WorkPage
 │   │   │   │   │   └── FamilyPage
 │   │   │   │   ├── ServicesPage
+│   │   │   │   │   └── BookPage (appointments)
 │   │   │   │   ├── EmergencyPage
 │   │   │   │   └── ProfilePage
-│   │   │   └── (admin) Layout [Sidebar + AdminHeader]
-│   │   │       ├── AdminDashboard
-│   │   │       ├── UsersPage
-│   │   │       ├── DocumentsPage
-│   │   │       ├── AnalyticsPage
-│   │   │       └── SettingsPage
+│   │   │   ├── (admin) Layout [Sidebar + AdminHeader + AdminRoleProvider]
+│   │   │   │   ├── AdminDashboard
+│   │   │   │   ├── UsersPage
+│   │   │   │   │   └── UserDetailPage ([id])
+│   │   │   │   ├── DocumentsPage
+│   │   │   │   ├── AnalyticsPage
+│   │   │   │   ├── TicketsPage
+│   │   │   │   └── SettingsPage
+│   │   │   └── (agency) Layout [AgencySidebar + AgencyHeader]
+│   │   │       ├── AgencySelectionPage
+│   │   │       ├── AgencyLoginPage
+│   │   │       └── [agencyKey]/
+│   │   │           ├── DashboardPage
+│   │   │           ├── DocumentsPage
+│   │   │           ├── CitizensPage
+│   │   │           ├── RequestsPage
+│   │   │           ├── AnalyticsPage
+│   │   │           └── SettingsPage
 ```
 
 ### Data Architecture

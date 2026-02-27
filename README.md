@@ -82,14 +82,17 @@ colombia-digital-wallet/
 │   │   │   │   ├── work/        # Trabajo / DIAN
 │   │   │   │   └── family/      # Familia
 │   │   │   ├── services/        # Programas sociales
+│   │   │   │   └── book/        # Agendar cita
 │   │   │   ├── emergency/       # Emergencias
 │   │   │   └── profile/         # Perfil
 │   │   ├── (admin)/             # Government admin dashboard
 │   │   │   └── admin/
 │   │   │       ├── dashboard/
 │   │   │       ├── users/
+│   │   │       │   └── [id]/    # User detail view
 │   │   │       ├── documents/
 │   │   │       ├── analytics/
+│   │   │       ├── tickets/     # Support tickets
 │   │   │       └── settings/
 │   │   ├── (agency)/            # Agency portal (multi-country)
 │   │   │   └── agency/
@@ -113,12 +116,13 @@ colombia-digital-wallet/
 │   │   ├── countries/           # Country JSON configs (CO, EC, GT)
 │   │   └── index.ts             # Config loader
 │   └── lib/
-│       ├── supabase/            # Supabase client setup
-│       ├── hooks/               # Custom React hooks
-│       ├── contexts/            # React contexts (Auth, Country)
-│       ├── utils/               # Utility functions
-│       ├── types/               # TypeScript types
-│       └── mock/                # Mock data (citizenData, adminData, agencyData)
+│       ├── supabase/            # Supabase client setup (client.ts, server.ts, middleware.ts)
+│       ├── hooks/               # Custom React hooks (useAuth)
+│       ├── providers/           # React Query provider
+│       ├── contexts/            # React contexts (Auth, Country, AdminRole)
+│       ├── utils/               # Utility functions (cn.ts)
+│       ├── types/               # TypeScript types (database.ts)
+│       └── mock/                # Mock data (citizenData, adminData, agencyData, ticketData)
 ├── supabase/
 │   └── migrations/              # Database migrations (SQL)
 ├── tests/
@@ -179,6 +183,19 @@ The app includes mock data for development and demos. No Supabase connection is 
 - Email: `demo@micolombiadigital.gov.co`
 - Password: `demo123`
 
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anonymous key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Admin only | Supabase service role key |
+| `NEXT_PUBLIC_DEFAULT_COUNTRY` | No | Default country code (default: `CO`) |
+| `NEXT_PUBLIC_APP_URL` | No | App URL (default: `http://localhost:3000`) |
+| `NEXT_PUBLIC_ENABLE_MOCK_DATA` | No | Enable mock data mode (default: `true`) |
+| `NEXT_PUBLIC_ENABLE_OFFLINE_MODE` | No | Enable offline/PWA mode (default: `true`) |
+| `NEXT_PUBLIC_ENABLE_BIOMETRIC_AUTH` | No | Enable biometric auth (default: `false`) |
+
 ## Available Scripts
 
 ```bash
@@ -188,6 +205,7 @@ npm run start        # Start production server
 npm run lint         # Run ESLint
 npm run test:e2e     # Run Playwright E2E tests
 npm run test:e2e:ui  # Run Playwright tests with UI mode
+npm run test:e2e:headed  # Run Playwright tests with visible browser
 ```
 
 ## Multi-Country Configuration
@@ -228,6 +246,8 @@ The platform supports multiple countries through JSON configuration files:
 All tables have Row-Level Security (RLS) enabled.
 
 ## Testing
+
+Tests run on 3 Playwright projects: **chromium-desktop**, **mobile-chrome** (Pixel 5), and **mobile-safari** (iPhone 12).
 
 ```bash
 # Install Playwright browsers (first time)

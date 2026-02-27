@@ -111,7 +111,7 @@ export function BottomNav({ badges = {}, className }: BottomNavProps) {
         className
       )}
       role="navigation"
-      aria-label="Main navigation"
+      aria-label="Navegacion principal"
     >
       <div className="flex items-center justify-around max-w-lg mx-auto px-2 pt-2 pb-1">
         {tabs.map((tab) => {

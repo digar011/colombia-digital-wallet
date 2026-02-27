@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/Input';
 import { useCountry } from '@/lib/contexts/CountryContext';
 import { useAuthContext } from '@/lib/contexts/AuthContext';
 import { cn } from '@/lib/utils/cn';
+import { loginSchema } from '@/lib/validations/auth';
 import type { CountryId } from '@/config';
 
 // ─── Validation helpers ─────────────────────────────────────────────────────
@@ -23,20 +24,39 @@ import type { CountryId } from '@/config';
 // Known test account usernames that bypass email/phone validation
 const TEST_USERNAMES = ['admin123'];
 
-function validateEmailOrPhone(value: string): string | null {
+/**
+ * Validates the emailOrPhone field.
+ * In email mode, delegates to the Zod loginSchema for the email field.
+ * In phone mode, uses regex for Colombian phone format.
+ * Always allows known test usernames.
+ */
+function validateEmailOrPhone(value: string, mode: 'email' | 'phone'): string | null {
   if (!value.trim()) return 'Este campo es requerido';
   // Allow test account usernames
   if (TEST_USERNAMES.includes(value.trim())) return null;
-  const isEmail = value.includes('@');
+
+  if (mode === 'email') {
+    const result = loginSchema.shape.email.safeParse(value);
+    if (!result.success) {
+      return result.error.issues[0]?.message ?? 'Correo no valido';
+    }
+    return null;
+  }
+
+  // Phone mode
   const isPhone = /^\+?\d{7,15}$/.test(value.replace(/\s/g, ''));
-  if (!isEmail && !isPhone) return 'Ingresa un correo, telefono o usuario valido';
-  if (isEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'El formato del correo no es valido';
+  if (!isPhone) return 'Ingresa un numero de telefono valido';
   return null;
 }
 
+/**
+ * Validates the password field using Zod loginSchema.
+ */
 function validatePassword(value: string): string | null {
-  if (!value) return 'La contrasena es requerida';
-  if (value.length < 6) return 'La contrasena debe tener al menos 6 caracteres';
+  const result = loginSchema.shape.password.safeParse(value);
+  if (!result.success) {
+    return result.error.issues[0]?.message ?? 'Contrasena no valida';
+  }
   return null;
 }
 
@@ -64,8 +84,8 @@ export default function LoginPage() {
     async (e: FormEvent) => {
       e.preventDefault();
 
-      // Validate
-      const emailOrPhoneError = validateEmailOrPhone(emailOrPhone);
+      // Validate using Zod-backed helpers
+      const emailOrPhoneError = validateEmailOrPhone(emailOrPhone, inputMode);
       const passwordError = validatePassword(password);
 
       if (emailOrPhoneError || passwordError) {
@@ -85,7 +105,7 @@ export default function LoginPage() {
         router.push('/dashboard');
       }
     },
-    [emailOrPhone, password, login, router]
+    [emailOrPhone, password, inputMode, login, router]
   );
 
   const handleBiometricLogin = useCallback(async () => {

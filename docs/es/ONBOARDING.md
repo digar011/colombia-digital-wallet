@@ -121,8 +121,9 @@ La app usa grupos de rutas de Next.js para separar layouts:
 | `src/components/documents/` | Componentes de tarjetas de documentos (Cedula, Vehiculo, Salud) |
 | `src/components/layout/` | Componentes de layout (BottomNav, Header, Sidebar, AgencySidebar, AgencyHeader) |
 | `src/config/countries/` | Configuraciones JSON por pais |
-| `src/lib/contexts/` | Proveedores de Context React (Auth, Country) |
-| `src/lib/mock/` | Datos de prueba para desarrollo (citizenData, adminData, agencyData) |
+| `src/lib/providers/` | Proveedor de React Query (QueryProvider) |
+| `src/lib/contexts/` | Proveedores de Context React (Auth, Country, AdminRole) |
+| `src/lib/mock/` | Datos de prueba para desarrollo (citizenData, adminData, agencyData, ticketData) |
 | `src/lib/supabase/` | Configuracion del cliente Supabase |
 | `supabase/migrations/` | Migraciones SQL de base de datos |
 | `tests/e2e/` | Archivos de pruebas E2E con Playwright |
@@ -227,7 +228,11 @@ main          ← codigo listo para produccion
 
 ## 6. Datos de Prueba (Mock Data)
 
-Los datos de prueba estan definidos en `src/lib/mock/citizenData.ts` y `src/lib/mock/adminData.ts`.
+Los datos de prueba estan definidos en `src/lib/mock/`:
+- `citizenData.ts` — Perfiles ciudadanos, documentos, vehiculos, salud, vacunas, citas, notificaciones
+- `adminData.ts` — Datos del panel admin, analiticas, registros de actividad, estado del sistema
+- `agencyData.ts` — Personal de agencia, documentos, solicitudes de verificacion, analiticas (3 paises)
+- `ticketData.ts` — Tickets de soporte
 
 ### Ciudadano de Prueba
 
@@ -408,11 +413,15 @@ test.describe('Nombre de la Funcionalidad', () => {
 ### Convencion de Nombres de Pruebas
 
 ```
-auth.spec.ts               — Flujos de autenticacion
-citizen-dashboard.spec.ts  — Panel del ciudadano
-citizen-documents.spec.ts  — Visualizacion de documentos
-admin-dashboard.spec.ts    — Panel de administracion
-agency.spec.ts             — Portal de agencias
+auth/auth.spec.ts              — Flujos de autenticacion (login, registro, verificacion)
+citizen/dashboard.spec.ts      — Panel del ciudadano
+citizen/documents.spec.ts      — Visualizacion de documentos
+citizen/profile.spec.ts        — Gestion de perfil
+citizen/emergency.spec.ts      — Contactos de emergencia
+citizen/services.spec.ts       — Servicios sociales
+admin/admin-dashboard.spec.ts  — Panel de administracion
+agency/agency.spec.ts          — Portal de agencias
+config/country-switch.spec.ts  — Cambio de pais multi-pais
 ```
 
 ---
@@ -433,7 +442,11 @@ agency.spec.ts             — Portal de agencias
 | `NEXT_PUBLIC_SUPABASE_URL` | Si | URL del proyecto Supabase |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Si | Clave anonima de Supabase |
 | `SUPABASE_SERVICE_ROLE_KEY` | Solo admin | Clave de rol de servicio Supabase |
-| `NEXT_PUBLIC_DEFAULT_COUNTRY` | No | Codigo de pais por defecto (CO) |
+| `NEXT_PUBLIC_DEFAULT_COUNTRY` | No | Codigo de pais por defecto (`CO`) |
+| `NEXT_PUBLIC_APP_URL` | No | URL de la app (`http://localhost:3000`) |
+| `NEXT_PUBLIC_ENABLE_MOCK_DATA` | No | Habilitar modo de datos mock (`true`) |
+| `NEXT_PUBLIC_ENABLE_OFFLINE_MODE` | No | Habilitar modo offline/PWA (`true`) |
+| `NEXT_PUBLIC_ENABLE_BIOMETRIC_AUTH` | No | Habilitar auth biometrica (`false`) |
 
 ---
 

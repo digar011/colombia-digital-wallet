@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/Input';
 import { useCountry } from '@/lib/contexts/CountryContext';
 import { useAuthContext } from '@/lib/contexts/AuthContext';
 import { cn } from '@/lib/utils/cn';
+import { registerSchema } from '@/lib/validations/auth';
 import type { DocumentType, Gender, RegisterData } from '@/lib/hooks/useAuth';
 
 // ─── Colombian departments ──────────────────────────────────────────────────
@@ -81,32 +82,66 @@ const TOTAL_STEPS = 4;
 const STEP_LABELS = ['Datos personales', 'Contacto', 'Seguridad', 'Verificacion'];
 const STEP_ICONS = [User, Phone, Shield, CreditCard];
 
-// ─── Validation per step ────────────────────────────────────────────────────
+// ─── Validation per step (powered by Zod registerSchema) ────────────────────
 
 function validateStep1(form: FormState): FormErrors {
   const errors: FormErrors = {};
-  if (!form.documentNumber.trim()) errors.documentNumber = 'Numero de documento es requerido';
-  else if (!/^\d{5,20}$/.test(form.documentNumber.trim())) errors.documentNumber = 'Numero de documento no valido';
-  if (!form.firstName.trim()) errors.firstName = 'Primer nombre es requerido';
-  if (!form.firstLastName.trim()) errors.firstLastName = 'Primer apellido es requerido';
-  if (!form.secondLastName.trim()) errors.secondLastName = 'Segundo apellido es requerido';
-  if (!form.dateOfBirth) errors.dateOfBirth = 'Fecha de nacimiento es requerida';
-  else {
+
+  // Use Zod for document_number validation
+  const docResult = registerSchema.shape.document_number.safeParse(form.documentNumber.trim());
+  if (!docResult.success) {
+    errors.documentNumber = docResult.error.issues[0]?.message ?? 'Numero de documento no valido';
+  }
+
+  // Use Zod for first_name validation
+  const firstNameResult = registerSchema.shape.first_name.safeParse(form.firstName.trim());
+  if (!firstNameResult.success) {
+    errors.firstName = firstNameResult.error.issues[0]?.message ?? 'Primer nombre es requerido';
+  }
+
+  // Use Zod for last_name on firstLastName
+  const lastNameResult = registerSchema.shape.last_name.safeParse(form.firstLastName.trim());
+  if (!lastNameResult.success) {
+    errors.firstLastName = lastNameResult.error.issues[0]?.message ?? 'Primer apellido es requerido';
+  }
+
+  // Validate secondLastName (required for Colombian registration, not in registerSchema)
+  if (!form.secondLastName.trim()) {
+    errors.secondLastName = 'Segundo apellido es requerido';
+  }
+
+  // Use Zod for date_of_birth validation
+  const dobResult = registerSchema.shape.date_of_birth.safeParse(form.dateOfBirth);
+  if (!dobResult.success) {
+    errors.dateOfBirth = dobResult.error.issues[0]?.message ?? 'Fecha de nacimiento es requerida';
+  } else {
+    // Additional age check (Colombia-specific: min 14 years)
     const dob = new Date(form.dateOfBirth);
     const today = new Date();
     const age = today.getFullYear() - dob.getFullYear();
     if (age < 14) errors.dateOfBirth = 'Debes tener al menos 14 anos';
     if (age > 120) errors.dateOfBirth = 'Fecha de nacimiento no valida';
   }
+
   return errors;
 }
 
 function validateStep2(form: FormState): FormErrors {
   const errors: FormErrors = {};
-  if (!form.email.trim()) errors.email = 'Correo electronico es requerido';
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.email = 'Formato de correo no valido';
-  if (!form.phone.trim()) errors.phone = 'Telefono es requerido';
-  else if (!/^\+?\d{7,15}$/.test(form.phone.replace(/\s/g, ''))) errors.phone = 'Numero de telefono no valido';
+
+  // Use Zod for email validation
+  const emailResult = registerSchema.shape.email.safeParse(form.email.trim());
+  if (!emailResult.success) {
+    errors.email = emailResult.error.issues[0]?.message ?? 'Correo electronico es requerido';
+  }
+
+  // Phone validation (required for this form, Colombian format)
+  if (!form.phone.trim()) {
+    errors.phone = 'Telefono es requerido';
+  } else if (!/^\+?\d{7,15}$/.test(form.phone.replace(/\s/g, ''))) {
+    errors.phone = 'Numero de telefono no valido';
+  }
+
   if (!form.department) errors.department = 'Selecciona un departamento';
   if (!form.city.trim()) errors.city = 'Ciudad es requerida';
   if (!form.address.trim()) errors.address = 'Direccion es requerida';
@@ -115,17 +150,24 @@ function validateStep2(form: FormState): FormErrors {
 
 function validateStep3(form: FormState): FormErrors {
   const errors: FormErrors = {};
-  if (!form.password) {
-    errors.password = 'Contrasena es requerida';
-  } else {
-    if (form.password.length < 8) errors.password = 'Minimo 8 caracteres';
-    else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(form.password))
-      errors.password = 'Debe incluir mayusculas, minusculas y numeros';
+
+  // Use Zod for password validation
+  const passwordResult = registerSchema.shape.password.safeParse(form.password);
+  if (!passwordResult.success) {
+    errors.password = passwordResult.error.issues[0]?.message ?? 'Contrasena es requerida';
   }
-  if (!form.confirmPassword) errors.confirmPassword = 'Confirma tu contrasena';
-  else if (form.password !== form.confirmPassword) errors.confirmPassword = 'Las contrasenas no coinciden';
+
+  // Use Zod for confirmPassword (requires cross-field refinement)
+  if (!form.confirmPassword) {
+    errors.confirmPassword = 'Confirma tu contrasena';
+  } else if (form.password !== form.confirmPassword) {
+    errors.confirmPassword = 'Las contrasenas no coinciden';
+  }
+
+  // PIN validation (not in registerSchema, app-specific)
   if (!form.pin) errors.pin = 'PIN es requerido';
   else if (!/^\d{6}$/.test(form.pin)) errors.pin = 'El PIN debe tener exactamente 6 digitos';
+
   if (!form.acceptTerms) errors.acceptTerms = 'Debes aceptar los terminos y condiciones';
   if (!form.acceptPrivacy) errors.acceptPrivacy = 'Debes aceptar la politica de privacidad';
   return errors;

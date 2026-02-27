@@ -1,8 +1,10 @@
 # API Reference — Mi Colombia Digital
 
+> **Status**: The API routes documented below are **planned** and not yet implemented. The app currently uses client-side mock data (`src/lib/mock/`) and direct Supabase client calls (`src/lib/supabase/client.ts`). These endpoints define the target API surface for production integration.
+
 ## Overview
 
-The Mi Colombia Digital platform exposes REST API endpoints through Next.js API routes. All endpoints require authentication unless otherwise noted.
+The Mi Colombia Digital platform will expose REST API endpoints through Next.js API routes. All endpoints will require authentication unless otherwise noted.
 
 ## Base URL
 

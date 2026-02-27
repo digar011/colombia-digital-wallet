@@ -121,8 +121,9 @@ The app uses Next.js route groups to separate layouts:
 | `src/components/documents/` | Document card components (Cedula, Vehicle, Health) |
 | `src/components/layout/` | Layout components (BottomNav, Header, Sidebar, AgencySidebar, AgencyHeader) |
 | `src/config/countries/` | Country-specific JSON configurations |
-| `src/lib/contexts/` | React Context providers (Auth, Country) |
-| `src/lib/mock/` | Mock data for development (citizenData, adminData, agencyData) |
+| `src/lib/providers/` | React Query provider (QueryProvider) |
+| `src/lib/contexts/` | React Context providers (Auth, Country, AdminRole) |
+| `src/lib/mock/` | Mock data for development (citizenData, adminData, agencyData, ticketData) |
 | `src/lib/supabase/` | Supabase client configuration |
 | `supabase/migrations/` | SQL database migrations |
 | `tests/e2e/` | Playwright E2E test files |
@@ -228,7 +229,11 @@ main          ← production-ready code
 
 ## 6. Working with Mock Data
 
-Mock data is defined in `src/lib/mock/citizenData.ts` and `src/lib/mock/adminData.ts`.
+Mock data is defined in `src/lib/mock/`:
+- `citizenData.ts` — Citizen profiles, documents, vehicles, health, vaccinations, appointments, notifications
+- `adminData.ts` — Admin dashboard data, analytics, activity logs, system health
+- `agencyData.ts` — Agency staff, documents, verification requests, agency analytics (all 3 countries)
+- `ticketData.ts` — Support tickets
 
 ### Mock Citizen
 
@@ -396,11 +401,15 @@ test.describe('Feature Name', () => {
 ### Test Naming Convention
 
 ```
-auth.spec.ts           — Authentication flows
-citizen-dashboard.spec.ts — Citizen dashboard
-citizen-documents.spec.ts — Document viewing
-admin-dashboard.spec.ts   — Admin dashboard
-agency.spec.ts            — Agency portal
+auth/auth.spec.ts              — Authentication flows (login, register, verify)
+citizen/dashboard.spec.ts      — Citizen dashboard
+citizen/documents.spec.ts      — Document viewing
+citizen/profile.spec.ts        — Profile management
+citizen/emergency.spec.ts      — Emergency contacts
+citizen/services.spec.ts       — Social services
+admin/admin-dashboard.spec.ts  — Admin dashboard
+agency/agency.spec.ts          — Agency portal
+config/country-switch.spec.ts  — Multi-country switching
 ```
 
 ---
@@ -421,7 +430,11 @@ agency.spec.ts            — Agency portal
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anonymous key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Admin only | Supabase service role key |
-| `NEXT_PUBLIC_DEFAULT_COUNTRY` | No | Default country code (CO) |
+| `NEXT_PUBLIC_DEFAULT_COUNTRY` | No | Default country code (default: `CO`) |
+| `NEXT_PUBLIC_APP_URL` | No | App URL (default: `http://localhost:3000`) |
+| `NEXT_PUBLIC_ENABLE_MOCK_DATA` | No | Enable mock data mode (default: `true`) |
+| `NEXT_PUBLIC_ENABLE_OFFLINE_MODE` | No | Enable offline/PWA mode (default: `true`) |
+| `NEXT_PUBLIC_ENABLE_BIOMETRIC_AUTH` | No | Enable biometric auth (default: `false`) |
 
 ---
 

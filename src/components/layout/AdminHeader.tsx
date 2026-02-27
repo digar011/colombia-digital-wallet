@@ -10,9 +10,11 @@ import {
   User,
   Settings,
   Bell,
+  Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { useCountry } from '@/lib/contexts/CountryContext';
+import { useAdminRole } from '@/lib/contexts/AdminRoleContext';
 import { CountrySwitcher } from './CountrySwitcher';
 
 // ─── Breadcrumb generation ──────────────────────────────────────────────────
@@ -27,6 +29,7 @@ const labelMap: Record<string, string> = {
   dashboard: 'Panel de Control',
   users: 'Ciudadanos',
   documents: 'Documentos',
+  tickets: 'Tickets',
   analytics: 'Analítica',
   settings: 'Configuración',
 };
@@ -189,6 +192,7 @@ export function AdminHeader({
   const breadcrumbs = generateBreadcrumbs(pathname);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const { isSuperAdmin, toggleRole } = useAdminRole();
 
   return (
     <header
@@ -279,6 +283,41 @@ export function AdminHeader({
 
           {/* Country switcher (for demo mode) */}
           <CountrySwitcher variant="compact" />
+
+          {/* Super Admin toggle */}
+          <button
+            type="button"
+            onClick={toggleRole}
+            className={cn(
+              'hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg',
+              'transition-all duration-200 text-xs font-semibold',
+              'border',
+              isSuperAdmin
+                ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700'
+            )}
+            title={isSuperAdmin ? 'Cambiar a Admin' : 'Cambiar a Super Admin'}
+          >
+            <Shield size={14} />
+            <span className="hidden md:inline">
+              {isSuperAdmin ? 'Super Admin' : 'Admin'}
+            </span>
+            <div
+              className={cn(
+                'w-7 h-4 rounded-full relative transition-colors duration-200',
+                isSuperAdmin
+                  ? 'bg-purple-500'
+                  : 'bg-gray-300 dark:bg-gray-600'
+              )}
+            >
+              <div
+                className={cn(
+                  'absolute top-0.5 w-3 h-3 rounded-full bg-white shadow-sm transition-transform duration-200',
+                  isSuperAdmin ? 'translate-x-3.5' : 'translate-x-0.5'
+                )}
+              />
+            </div>
+          </button>
 
           {/* Notifications */}
           <button

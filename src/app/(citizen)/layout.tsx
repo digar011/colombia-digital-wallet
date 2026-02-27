@@ -47,6 +47,7 @@ export default function CitizenLayout({ children }: CitizenLayoutProps) {
 
       {/* Main content area */}
       <main
+        id="main-content"
         className="flex-1 overflow-y-auto pb-20"
         role="main"
       >

@@ -18,13 +18,13 @@
 ┌─────────────────────────────────────────────────┐
 │              APLICACION NEXT.JS                  │
 │                                                  │
-│  ┌──────────┐  ┌──────────┐  ┌────────────────┐│
-│  │ (auth)/   │  │(citizen)/│  │   (admin)/     ││
-│  │ Rutas    │  │ Rutas    │  │   Rutas        ││
-│  └──────────┘  └──────────┘  └────────────────┘│
+│  ┌────────┐ ┌────────┐ ┌────────┐ ┌──────────┐ │
+│  │(auth)/ │ │(citiz.)│ │(admin)/│ │(agency)/ │ │
+│  │Rutas   │ │Rutas   │ │Rutas   │ │Rutas     │ │
+│  └────────┘ └────────┘ └────────┘ └──────────┘ │
 │                                                  │
 │  ┌──────────────────────────────────────────┐   │
-│  │           Rutas API (/api/)              │   │
+│  │    Cliente Supabase (llamadas directas)   │   │
 │  └──────────────────┬───────────────────────┘   │
 └─────────────────────┼───────────────────────────┘
                       │
@@ -63,14 +63,27 @@ App
 │   │   │   │   │   ├── PaginaTrabajo
 │   │   │   │   │   └── PaginaFamilia
 │   │   │   │   ├── PaginaServicios
+│   │   │   │   │   └── PaginaAgendar (citas)
 │   │   │   │   ├── PaginaEmergencias
 │   │   │   │   └── PaginaPerfil
-│   │   │   └── Layout (admin) [BarraLateral + EncabezadoAdmin]
-│   │   │       ├── PanelAdmin
-│   │   │       ├── PaginaUsuarios
-│   │   │       ├── PaginaDocumentos
-│   │   │       ├── PaginaAnaliticas
-│   │   │       └── PaginaConfiguracion
+│   │   │   ├── Layout (admin) [BarraLateral + EncabezadoAdmin + AdminRoleProvider]
+│   │   │   │   ├── PanelAdmin
+│   │   │   │   ├── PaginaUsuarios
+│   │   │   │   │   └── PaginaDetalleUsuario ([id])
+│   │   │   │   ├── PaginaDocumentos
+│   │   │   │   ├── PaginaAnaliticas
+│   │   │   │   ├── PaginaTickets
+│   │   │   │   └── PaginaConfiguracion
+│   │   │   └── Layout (agency) [AgencySidebar + AgencyHeader]
+│   │   │       ├── PaginaSeleccionAgencia
+│   │   │       ├── PaginaLoginAgencia
+│   │   │       └── [agencyKey]/
+│   │   │           ├── PaginaPanelAgencia
+│   │   │           ├── PaginaDocumentos
+│   │   │           ├── PaginaCiudadanos
+│   │   │           ├── PaginaSolicitudes
+│   │   │           ├── PaginaAnaliticas
+│   │   │           └── PaginaConfiguracion
 ```
 
 ### Arquitectura de Datos

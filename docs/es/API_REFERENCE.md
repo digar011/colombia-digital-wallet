@@ -1,8 +1,10 @@
 # Referencia de API — Mi Colombia Digital
 
+> **Estado**: Las rutas API documentadas a continuacion estan **planificadas** y aun no implementadas. La app actualmente usa datos mock del lado del cliente (`src/lib/mock/`) y llamadas directas al cliente Supabase (`src/lib/supabase/client.ts`). Estos endpoints definen la superficie API objetivo para integracion en produccion.
+
 ## Vista General
 
-La plataforma Mi Colombia Digital expone endpoints REST API a traves de rutas API de Next.js. Todos los endpoints requieren autenticacion a menos que se indique lo contrario.
+La plataforma Mi Colombia Digital expondra endpoints REST API a traves de rutas API de Next.js. Todos los endpoints requeriran autenticacion a menos que se indique lo contrario.
 
 ## URL Base
 

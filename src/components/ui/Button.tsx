@@ -50,16 +50,19 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       rightIcon: RightIcon,
       fullWidth = false,
       disabled,
+      type = 'button',
       children,
       ...props
     },
     ref
   ) => {
     const iconSize = iconSizeMap[size];
+    const isDisabled = disabled || isLoading;
 
     return (
       <button
         ref={ref}
+        type={type}
         className={cn(
           'inline-flex items-center justify-center font-medium transition-all duration-200',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
@@ -69,7 +72,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           fullWidth && 'w-full',
           className
         )}
-        disabled={disabled || isLoading}
+        disabled={isDisabled}
+        aria-disabled={isDisabled || undefined}
         {...props}
       >
         {isLoading ? (

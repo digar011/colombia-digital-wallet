@@ -27,3 +27,12 @@ export type { AvatarProps } from './Avatar';
 
 export { QRCode } from './QRCode';
 export type { QRCodeProps } from './QRCode';
+
+export { Skeleton } from './Skeleton';
+export type { SkeletonProps } from './Skeleton';
+
+export { SkeletonCard } from './SkeletonCard';
+export type { SkeletonCardProps } from './SkeletonCard';
+
+export { SkeletonTable } from './SkeletonTable';
+export type { SkeletonTableProps } from './SkeletonTable';

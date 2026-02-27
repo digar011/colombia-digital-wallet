@@ -45,23 +45,19 @@ npx playwright show-report
 tests/
 └── e2e/
     ├── auth/
-    │   └── auth.spec.ts           # Login, register, logout, verify flows
+    │   └── auth.spec.ts              # Login, register, verify flows
     ├── citizen/
-    │   ├── dashboard.spec.ts      # Dashboard rendering, navigation
-    │   ├── documents.spec.ts      # Document viewing, card interactions
-    │   ├── identity.spec.ts       # Cedula Digital specific tests
-    │   ├── vehicles.spec.ts       # Vehicle cards, SOAT status
-    │   ├── health.spec.ts         # Health records, vaccinations
-    │   ├── services.spec.ts       # Social programs, appointments
-    │   ├── emergency.spec.ts      # Emergency contacts, call buttons
-    │   └── profile.spec.ts        # Profile page, settings
+    │   ├── dashboard.spec.ts         # Dashboard rendering, navigation
+    │   ├── documents.spec.ts         # Document viewing, card interactions
+    │   ├── services.spec.ts          # Social programs, appointments
+    │   ├── emergency.spec.ts         # Emergency contacts, call buttons
+    │   └── profile.spec.ts           # Profile page, settings
     ├── admin/
-    │   ├── dashboard.spec.ts      # Admin dashboard stats
-    │   ├── users.spec.ts          # Citizen management
-    │   ├── documents.spec.ts      # Document issuance
-    │   └── analytics.spec.ts      # Analytics views
+    │   └── admin-dashboard.spec.ts   # Admin dashboard stats and management
+    ├── agency/
+    │   └── agency.spec.ts            # Agency portal selection, login, navigation
     └── config/
-        └── country-switch.spec.ts # Multi-country switching
+        └── country-switch.spec.ts    # Multi-country switching
 ```
 
 ## Writing Tests
@@ -126,8 +122,7 @@ await expect(page.getByTestId('badge')).toHaveAttribute('data-status', 'active')
 The Playwright configuration is in `playwright.config.ts`:
 
 - **Base URL**: `http://localhost:3000`
-- **Browsers**: Chromium, Firefox, WebKit
-- **Mobile**: iPhone 12, Pixel 5 viewports
+- **Projects**: chromium-desktop, mobile-chrome (Pixel 5), mobile-safari (iPhone 12)
 - **Timeouts**: 30s per test, 5s per action
 - **Retries**: 1 on CI, 0 locally
 - **Screenshots**: On failure only

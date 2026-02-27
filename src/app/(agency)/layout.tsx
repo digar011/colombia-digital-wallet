@@ -47,6 +47,7 @@ export default function AgencyLayout({ children }: AgencyLayoutProps) {
 
         {/* Page content */}
         <main
+          id="main-content"
           className="flex-1 overflow-y-auto pt-1"
           role="main"
         >
