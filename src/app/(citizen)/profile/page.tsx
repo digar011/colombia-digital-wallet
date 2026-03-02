@@ -25,10 +25,16 @@ import {
   IdCard,
   HelpCircle,
   FileText,
+  Pencil,
+  Save,
+  X,
 } from 'lucide-react';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { mockCitizen, mockNotifications } from '@/lib/mock/citizenData';
+import { updateProfileSchema } from '@/lib/validations/citizen';
 
 // ─── Settings Row ────────────────────────────────────────────────────────────
 
@@ -122,8 +128,51 @@ export default function ProfilePage() {
   const [biometricEnabled, setBiometricEnabled] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    phone: mockCitizen.phone,
+    email: mockCitizen.email,
+    address: mockCitizen.address,
+    city: mockCitizen.city,
+    department: 'Cundinamarca',
+  });
+  const [editErrors, setEditErrors] = useState<{
+    phone?: string;
+    email?: string;
+    address?: string;
+    city?: string;
+    department?: string;
+  }>({});
 
   const unreadCount = mockNotifications.filter((n) => !n.read).length;
+
+  const validateEditField = (field: keyof typeof editForm, value: string): string | null => {
+    const result = updateProfileSchema.shape[field].safeParse(value);
+    if (!result.success) {
+      return result.error.issues[0]?.message ?? 'Campo no valido';
+    }
+    return null;
+  };
+
+  const handleEditSubmit = () => {
+    const errors: typeof editErrors = {};
+    const fields = ['phone', 'email', 'address', 'city', 'department'] as const;
+
+    for (const field of fields) {
+      const error = validateEditField(field, editForm[field]);
+      if (error) {
+        errors[field] = error;
+      }
+    }
+
+    setEditErrors(errors);
+
+    if (Object.keys(errors).length > 0) return;
+
+    alert('Perfil actualizado exitosamente.\n\n(En produccion, esto guardaria los cambios en la base de datos.)');
+    setIsEditing(false);
+    setEditErrors({});
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 400);
@@ -212,36 +261,114 @@ export default function ProfilePage() {
         {/* ── Personal Info ── */}
         <Card variant="elevated">
           <CardBody>
-            <h3 className="text-sm font-bold text-text-primary dark:text-text-primary-dark mb-3">
-              Informacion Personal
-            </h3>
-            <div className="space-y-3">
-              <ProfileInfoRow
-                icon={User}
-                label="Nombre Completo"
-                value={mockCitizen.fullName}
-              />
-              <ProfileInfoRow
-                icon={IdCard}
-                label="Documento"
-                value={`CC ${mockCitizen.documentNumber}`}
-              />
-              <ProfileInfoRow
-                icon={Mail}
-                label="Correo Electronico"
-                value={mockCitizen.email}
-              />
-              <ProfileInfoRow
-                icon={Phone}
-                label="Telefono"
-                value={mockCitizen.phone}
-              />
-              <ProfileInfoRow
-                icon={MapPin}
-                label="Direccion"
-                value={`${mockCitizen.address}, ${mockCitizen.city}`}
-              />
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-text-primary dark:text-text-primary-dark">
+                Informacion Personal
+              </h3>
+              {!isEditing && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center gap-1 text-xs font-medium text-colombia-blue dark:text-colombia-yellow hover:underline"
+                >
+                  <Pencil size={12} />
+                  Editar
+                </button>
+              )}
             </div>
+
+            {isEditing ? (
+              <div className="space-y-3">
+                <ProfileInfoRow icon={User} label="Nombre Completo" value={mockCitizen.fullName} />
+                <ProfileInfoRow icon={IdCard} label="Documento" value={`CC ${mockCitizen.documentNumber}`} />
+                <Input
+                  label="Correo Electronico"
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => {
+                    setEditForm({ ...editForm, email: e.target.value });
+                    if (editErrors.email) setEditErrors((prev) => ({ ...prev, email: undefined }));
+                  }}
+                  error={editErrors.email}
+                  leftIcon={Mail}
+                  inputSize="sm"
+                />
+                <Input
+                  label="Telefono"
+                  type="tel"
+                  value={editForm.phone}
+                  onChange={(e) => {
+                    setEditForm({ ...editForm, phone: e.target.value });
+                    if (editErrors.phone) setEditErrors((prev) => ({ ...prev, phone: undefined }));
+                  }}
+                  error={editErrors.phone}
+                  leftIcon={Phone}
+                  inputSize="sm"
+                  placeholder="+57 300 123 4567"
+                />
+                <Input
+                  label="Direccion"
+                  value={editForm.address}
+                  onChange={(e) => {
+                    setEditForm({ ...editForm, address: e.target.value });
+                    if (editErrors.address) setEditErrors((prev) => ({ ...prev, address: undefined }));
+                  }}
+                  error={editErrors.address}
+                  leftIcon={MapPin}
+                  inputSize="sm"
+                />
+                <Input
+                  label="Ciudad"
+                  value={editForm.city}
+                  onChange={(e) => {
+                    setEditForm({ ...editForm, city: e.target.value });
+                    if (editErrors.city) setEditErrors((prev) => ({ ...prev, city: undefined }));
+                  }}
+                  error={editErrors.city}
+                  inputSize="sm"
+                />
+                <Input
+                  label="Departamento"
+                  value={editForm.department}
+                  onChange={(e) => {
+                    setEditForm({ ...editForm, department: e.target.value });
+                    if (editErrors.department) setEditErrors((prev) => ({ ...prev, department: undefined }));
+                  }}
+                  error={editErrors.department}
+                  inputSize="sm"
+                />
+                <div className="flex items-center gap-2 pt-2">
+                  <Button variant="primary" size="sm" leftIcon={Save} onClick={handleEditSubmit}>
+                    Guardar
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    leftIcon={X}
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditErrors({});
+                      setEditForm({
+                        phone: mockCitizen.phone,
+                        email: mockCitizen.email,
+                        address: mockCitizen.address,
+                        city: mockCitizen.city,
+                        department: 'Cundinamarca',
+                      });
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <ProfileInfoRow icon={User} label="Nombre Completo" value={mockCitizen.fullName} />
+                <ProfileInfoRow icon={IdCard} label="Documento" value={`CC ${mockCitizen.documentNumber}`} />
+                <ProfileInfoRow icon={Mail} label="Correo Electronico" value={mockCitizen.email} />
+                <ProfileInfoRow icon={Phone} label="Telefono" value={mockCitizen.phone} />
+                <ProfileInfoRow icon={MapPin} label="Direccion" value={`${mockCitizen.address}, ${mockCitizen.city}`} />
+              </div>
+            )}
           </CardBody>
         </Card>
 

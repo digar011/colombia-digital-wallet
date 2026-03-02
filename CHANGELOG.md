@@ -4,7 +4,17 @@ All notable changes to the Colombia Digital Wallet (Mi Colombia Digital) project
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased] - 2026-02-26
+## [Unreleased] - 2026-03-01
+
+### Added
+- **Zod validation wired into citizen and admin forms**: Profile edit form with `updateProfileSchema`, appointment booking form with `appointmentBookingSchema`, admin document issuance with `issueDocumentSchema`, admin user search with `searchCitizensSchema`, admin user status change with `updateCitizenStatusSchema`.
+- **Profile edit mode**: Inline editing for phone, email, address, city, and department with real-time Zod validation and Spanish error messages.
+- **Appointment booking form**: Service type selector, date/time pickers, and notes field with full validation replacing the placeholder alert.
+- **Admin document issuance validation**: Form-level validation on citizen ID and document type with inline error display.
+- **Admin user status change form**: Status selector and reason field with min-length validation for audit trail.
+- **AdminRoleContext**: Missing context file created (`src/lib/contexts/AdminRoleContext.tsx`) to fix pre-existing build error.
+
+## [0.4.0] - 2026-02-26
 
 ### Added
 - Security headers in `next.config.mjs`: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-DNS-Prefetch-Control.

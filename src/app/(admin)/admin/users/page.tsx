@@ -33,6 +33,7 @@ import {
   type DocumentType,
   type Department,
 } from '@/lib/mock/adminData';
+import { searchCitizensSchema } from '@/lib/validations/admin';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -69,6 +70,7 @@ export default function AdminUsersPage() {
 
   // Search & filter state
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchError, setSearchError] = useState<string | undefined>();
   const [statusFilter, setStatusFilter] = useState<VerificationStatus | ''>('');
   const [docTypeFilter, setDocTypeFilter] = useState<DocumentType | ''>('');
   const [departmentFilter, setDepartmentFilter] = useState<Department | ''>('');
@@ -197,6 +199,20 @@ export default function AdminUsersPage() {
     });
   }, []);
 
+  // ── Search validation ─────────────────────────────────────────
+  const validateSearchQuery = useCallback((value: string) => {
+    if (!value.trim()) {
+      setSearchError(undefined);
+      return;
+    }
+    const result = searchCitizensSchema.shape.query.safeParse(value);
+    if (!result.success) {
+      setSearchError(result.error.issues[0]?.message ?? 'Busqueda no valida');
+    } else {
+      setSearchError(undefined);
+    }
+  }, []);
+
   // ── Clear filters ─────────────────────────────────────────────
 
   const hasActiveFilters = statusFilter || docTypeFilter || departmentFilter;
@@ -276,7 +292,11 @@ export default function AdminUsersPage() {
                   placeholder="Buscar por nombre, número de documento o correo..."
                   leftIcon={Search}
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    validateSearchQuery(e.target.value);
+                  }}
+                  error={searchError}
                   inputSize="md"
                 />
               </div>
