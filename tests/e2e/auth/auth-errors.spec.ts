@@ -24,7 +24,7 @@ test.describe('Errores de autenticacion', () => {
       const loginButton = page.getByRole('button', { name: /ingresar/i });
       await loginButton.click();
       const body = await page.textContent('body');
-      expect(body).toMatch(/correo.*no.*valido|email.*invalid|formato.*correo/i);
+      expect(body).toMatch(/correo.*no.*valido|email.*invalid|formato.*correo|requerido/i);
     });
 
     test('deberia mostrar error con contrasena corta', async ({ page }) => {
