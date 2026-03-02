@@ -21,10 +21,6 @@
 ### P2 -- Medium
 
 - [ ] Replace in-memory rate limiter with Redis — [#29](https://github.com/digar011/colombia-digital-wallet/issues/29) — **requires Redis/KV infra**
-- [ ] Add loading.tsx and Suspense boundaries for all routes — [#30](https://github.com/digar011/colombia-digital-wallet/issues/30)
-- [ ] Add structured data (JSON-LD) for public pages — [#31](https://github.com/digar011/colombia-digital-wallet/issues/31)
-- [ ] Add npm audit to CI pipeline — [#32](https://github.com/digar011/colombia-digital-wallet/issues/32)
-- [ ] Configure Playwright for production build — [#33](https://github.com/digar011/colombia-digital-wallet/issues/33)
 
 ### Backlog
 
@@ -41,6 +37,12 @@
 ---
 
 ## Completed
+
+### Production Hardening: P2 Items (2026-03-02)
+- [x] Add loading.tsx and Suspense boundaries for all routes — PR #46, closes #30
+- [x] Add structured data (JSON-LD) for public pages — PR #45, closes #31
+- [x] Add npm audit to CI pipeline — PR #43, closes #32
+- [x] Configure Playwright for production build — PR #44, closes #33
 
 ### Production Hardening: P1 Items (2026-03-02)
 - [x] Add robots.txt and sitemap.xml via Next.js metadata API — PR #37, closes #20

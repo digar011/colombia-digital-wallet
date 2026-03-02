@@ -43,12 +43,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Icon generation script** (`scripts/generate-pwa-icons.mjs`): Reproducible PNG generation from SVG source.
 - Updated `manifest.json` to reference PNG icons as primary with separate maskable entry.
 
+- **robots.txt and sitemap.xml** (PR #37): Generated via Next.js metadata API. Robots blocks `/admin/*`, `/agency/*`, `/api/*`; sitemap includes public pages with priority and changeFrequency.
+- **Route-level error boundaries** (PR #38): `error.tsx` in each route group (`(citizen)`, `(admin)`, `(agency)`, `(auth)`) with Spanish UI, Sentry capture, retry button, and navigation to safe page.
+- **Makefile** (PR #35): Standardized development commands (`make dev`, `make build`, `make ci`, `make e2e`, etc.) per Codexium standards.
+- **Biome formatter** (PR #41): Biome v2.4.4 configured with project conventions (2-space indent, single quotes, 100-char lines). `npm run format` and `npm run format:check` scripts added.
+- **223 unit tests** (PR #40): Jest + ts-jest set up with 8 test suites covering `cn`, `csrf`, `logger`, `apiHelpers`, `rateLimit`, and all Zod validation schemas (auth, citizen, admin). 98%+ code coverage.
+- **Sentry DSN documentation** (PR #36): Added `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` to `.env.example`, CLAUDE.md env table, and ONBOARDING docs (EN + ES).
+- **Loading states for all routes** (PR #46): Added `loading.tsx` with `LoadingSpinner` in every route group — citizen (dashboard, documents, profile, services, emergency, family, health, identity, vehicles, work), admin, agency, and auth — for automatic Next.js Suspense boundaries.
+- **JSON-LD structured data** (PR #45): Government organization schema on layout and login page for SEO rich results.
+- **npm audit in CI pipeline** (PR #43): Added `npm audit --audit-level=high` step to GitHub Actions workflow after install, with `continue-on-error: true` to avoid blocking on advisory-only findings. Added `audit` Makefile target.
+- **Playwright production build testing** (PR #44): New `playwright.prod.config.ts` runs E2E tests against `next start` production server. CI updated from dev server to production build. Added `e2e-prod` Makefile target.
+
 ### Changed
 - **Performance optimization**: Dynamic import of `react-qr-code` library via `next/dynamic` — QR code is now lazy-loaded only on document detail pages, reducing initial bundle size for all other routes.
 - **Avatar optimization**: Convert `<img>` tags to `next/image` in Header, AdminHeader, and AgencyHeader for built-in lazy loading, size hints, and future image optimization support.
 
 ### Fixed
-- **CSP hardened** (PR #24): Removed `'unsafe-eval'` from `script-src` directive in Content Security Policy. `eval()` is only needed by Next.js in development mode and was unnecessarily permissive for production. `'unsafe-inline'` retained for both `script-src` and `style-src` as Next.js App Router requires inline scripts for hydration; full nonce-based CSP is a future improvement.
+- **CSP hardened** (PR #42): Removed `'unsafe-eval'` from `script-src` directive in Content Security Policy. `eval()` is only needed by Next.js in development mode and was unnecessarily permissive for production. `'unsafe-inline'` retained for both `script-src` and `style-src` as Next.js App Router requires inline scripts for hydration; full nonce-based CSP is a future improvement.
+- **Hardcoded mock API key removed** (PR #34): Removed fake API key string (`sk-ag-7f3a92bc-...`) from agency settings page, replaced with masked placeholder.
+- **Aria-live regions** (PR #39): Added `role="alert"` / `aria-live="assertive"` to auth error messages, `role="status"` / `aria-live="polite"` to success confirmations, search result counts, toast notifications, and loading states for screen reader announcements.
 - **WCAG 2.1 AA accessibility audit**: Comprehensive accessibility improvements across all UI components and pages.
   - `layout.tsx`: Allow user zoom (`userScalable: true`, `maximumScale: 5`) — fixes WCAG 1.4.4 Resize Text.
   - `Button.tsx`: Add `aria-busy` when loading, `aria-hidden` on decorative icons.
