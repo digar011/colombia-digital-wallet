@@ -4,23 +4,32 @@
 > For detailed descriptions, dependencies, and file-level instructions, see `docs/TODO_QUEUE.md`.
 > For full rationale behind each change, see `docs/PRODUCTION_ROADMAP.md`.
 >
-> Last Updated: 2026-03-01
+> Last Updated: 2026-03-02
 
 ---
 
 ## Queue
 
-### P0 -- Blockers
+### P0 -- Blockers (require real Supabase credentials)
 
-- [ ] Replace mock auth with Supabase Auth (useAuth, AuthContext, middleware, login/register/verify pages) — **requires real Supabase credentials**
+- [ ] Replace mock auth with Supabase Auth — [#15](https://github.com/digar011/colombia-digital-wallet/issues/15)
+- [ ] Connect API routes to Supabase database — [#16](https://github.com/digar011/colombia-digital-wallet/issues/16)
+- [ ] Wire pages to React Query hooks — [#17](https://github.com/digar011/colombia-digital-wallet/issues/17)
+- [ ] Add admin role-based access control — [#18](https://github.com/digar011/colombia-digital-wallet/issues/18)
+- [ ] Fix npm audit vulnerabilities — [#19](https://github.com/digar011/colombia-digital-wallet/issues/19)
 
-### P1 -- Critical
+### P2 -- Medium
 
-- [ ] End-to-end RLS verification with real Supabase Auth tokens across all 12 tables — **requires real Supabase**
+- [ ] Replace in-memory rate limiter with Redis — [#29](https://github.com/digar011/colombia-digital-wallet/issues/29) — **requires Redis/KV infra**
+- [ ] Add loading.tsx and Suspense boundaries for all routes — [#30](https://github.com/digar011/colombia-digital-wallet/issues/30)
+- [ ] Add structured data (JSON-LD) for public pages — [#31](https://github.com/digar011/colombia-digital-wallet/issues/31)
+- [ ] Add npm audit to CI pipeline — [#32](https://github.com/digar011/colombia-digital-wallet/issues/32)
+- [ ] Configure Playwright for production build — [#33](https://github.com/digar011/colombia-digital-wallet/issues/33)
 
-### P3 -- Medium
+### Backlog
 
-- [ ] Load testing with k6 or Artillery (target: 10,000 concurrent users) — **requires running infrastructure**
+- [ ] End-to-end RLS verification with real Supabase Auth tokens — **requires real Supabase**
+- [ ] Load testing with k6 or Artillery (10,000 concurrent) — **requires running infrastructure**
 - [ ] API key management for external agency integrations — **requires real API keys**
 
 ---
@@ -32,6 +41,17 @@
 ---
 
 ## Completed
+
+### Production Hardening: P1 Items (2026-03-02)
+- [x] Add robots.txt and sitemap.xml via Next.js metadata API — PR #37, closes #20
+- [x] Add route-level error.tsx boundaries (citizen, admin, agency, auth) — PR #38, closes #21
+- [x] Remove hardcoded mock API key from agency settings — PR #34, closes #22
+- [x] Add aria-live regions for dynamic content (forms, toasts, search counts) — PR #39, closes #23
+- [x] Harden CSP: remove unsafe-eval from script-src — PR #42, closes #24
+- [x] Add Makefile with standardized development commands — PR #35, closes #25
+- [x] Configure Biome code formatter (v2.4.4) — PR #41, closes #26
+- [x] Add 223 unit tests with Jest (98%+ coverage on utils/middleware/validations) — PR #40, closes #27
+- [x] Document Sentry DSN setup in .env.example and ONBOARDING docs — PR #36, closes #28
 
 ### API Routes, React Query, Sentry, Offline Caching (2026-03-02)
 - [x] Implement 21 API routes with mock data (auth, citizens, admin, verify) — PR #11
