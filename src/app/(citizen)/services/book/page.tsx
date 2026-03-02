@@ -471,8 +471,8 @@ export default function BookAppointmentPage() {
     return (
       <div className="px-4 mt-4 space-y-4">
         {/* Success header */}
-        <div className="flex flex-col items-center text-center py-4">
-          <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-3">
+        <div className="flex flex-col items-center text-center py-4" role="status" aria-live="polite">
+          <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-3" aria-hidden="true">
             <CheckCircle2 size={36} className="text-green-600" />
           </div>
           <h2 className="text-lg font-bold text-text-primary dark:text-text-primary-dark">

@@ -529,15 +529,17 @@ export default function AgencyRequestsPage() {
       {/* ── Toast ──────────────────────────────────────────── */}
       {toast && (
         <div
+          role={toast.type === 'error' ? 'alert' : 'status'}
+          aria-live={toast.type === 'error' ? 'assertive' : 'polite'}
           className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium animate-slide-up ${
             toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
           }`}
         >
           <div className="flex items-center gap-2">
             {toast.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4" />
+              <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
             ) : (
-              <XCircle className="w-4 h-4" />
+              <XCircle className="w-4 h-4" aria-hidden="true" />
             )}
             {toast.message}
           </div>

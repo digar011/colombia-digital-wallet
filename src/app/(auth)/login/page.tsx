@@ -150,7 +150,7 @@ export default function LoginPage() {
         >
           {/* General error */}
           {errors.general && (
-            <div className="bg-colombia-red/10 border border-colombia-red/30 rounded-lg p-3 text-center">
+            <div role="alert" aria-live="assertive" className="bg-colombia-red/10 border border-colombia-red/30 rounded-lg p-3 text-center">
               <p className="text-sm text-colombia-red font-medium">{errors.general}</p>
             </div>
           )}

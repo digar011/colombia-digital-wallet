@@ -562,7 +562,7 @@ export default function AdminTicketsPage() {
 
       {/* ── Results count ────────────────────────────────────── */}
       {filteredTickets.length > 0 && (
-        <p className="text-xs text-text-secondary dark:text-gray-500 text-center">
+        <p className="text-xs text-text-secondary dark:text-gray-500 text-center" aria-live="polite" role="status">
           Mostrando {filteredTickets.length} de {mockTickets.length} tickets
         </p>
       )}

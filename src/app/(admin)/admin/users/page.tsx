@@ -268,7 +268,7 @@ export default function AdminUsersPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-text-primary">Gestión de Ciudadanos</h1>
-            <p className="text-sm text-text-secondary mt-1">
+            <p className="text-sm text-text-secondary mt-1" aria-live="polite" role="status">
               {formatNumber(mockCitizens.length)} ciudadanos totales &middot;{' '}
               {formatNumber(filteredCitizens.length)} mostrando
             </p>
