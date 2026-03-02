@@ -12,27 +12,16 @@
 
 ### P0 -- Blockers
 
-- [ ] Replace mock auth with Supabase Auth (useAuth, AuthContext, middleware, login/register/verify pages)
-- [ ] Implement API routes for all endpoints documented in `docs/en/API_REFERENCE.md`
-- [ ] Connect all citizen/admin/agency pages to real data via TanStack React Query hooks
+- [ ] Replace mock auth with Supabase Auth (useAuth, AuthContext, middleware, login/register/verify pages) — **requires real Supabase credentials**
 
 ### P1 -- Critical
 
-- [ ] End-to-end RLS verification with real Supabase Auth tokens across all 12 tables
-- [ ] Wire Zod validation schemas into all API routes (server-side) — client-side forms done
-- [ ] Integrate CSRF protection into state-changing API routes — CSRF endpoint + hook done
-- [ ] Set up Sentry error monitoring (`@sentry/nextjs`) — deferred
-- [ ] Implement structured server-side logging in API routes — middleware + auth logging done
-
-### P2 -- High
-
-- [ ] Implement service worker with `next-pwa` for offline document caching
+- [ ] End-to-end RLS verification with real Supabase Auth tokens across all 12 tables — **requires real Supabase**
 
 ### P3 -- Medium
 
-- [ ] Rate limiting on API routes — infrastructure ready, CSRF endpoint rate-limited as reference
-- [ ] Load testing with k6 or Artillery (target: 10,000 concurrent users) — deferred
-- [ ] API key management for external agency integrations
+- [ ] Load testing with k6 or Artillery (target: 10,000 concurrent users) — **requires running infrastructure**
+- [ ] API key management for external agency integrations — **requires real API keys**
 
 ---
 
@@ -43,6 +32,20 @@
 ---
 
 ## Completed
+
+### API Routes, React Query, Sentry, Offline Caching (2026-03-02)
+- [x] Implement 21 API routes with mock data (auth, citizens, admin, verify) — PR #11
+- [x] Wire Zod validation into all API routes (server-side) — PR #11
+- [x] Integrate CSRF protection into all state-changing routes — PR #11
+- [x] Wire structured logging (logApiRequest, logAuthEvent, logDocumentAccess) into all routes — PR #11
+- [x] Apply rate limiting (authLimiter, citizenApiLimiter, adminLimiter, verificationLimiter) to all routes — PR #11
+- [x] Create React Query hooks for all 17 API endpoints with query key factories and cache invalidation — PR #12
+- [x] Create type-safe API client utility (fetchApi) with standardized error handling — PR #12
+- [x] Set up Sentry error monitoring with @sentry/nextjs (client, server, edge configs) — PR #9
+- [x] Add global error boundary with Spanish UI — PR #9
+- [x] Enhance service worker with runtime caching strategies (NetworkFirst, CacheFirst, StaleWhileRevalidate) — PR #10
+- [x] Create offline fallback page (/offline) with Spanish UI — PR #10
+- [x] Add useOfflineStatus hook and OfflineBanner component — PR #10
 
 ### Validation, Logging, Security, A11y, Tests, PWA, Performance (2026-03-01)
 - [x] Wire Zod validation into citizen and admin forms (profile, booking, documents, users, status) — PR #2
