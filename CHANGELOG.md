@@ -22,6 +22,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - `tests/e2e/auth/auth-errors.spec.ts` (10 tests): Login validation errors (empty form, invalid email, short password), phone/email toggle, register step validation, OTP page.
   - `tests/e2e/admin/admin-settings.spec.ts` (8 tests): Settings page rendering, tab navigation (System, API Keys, Roles, Audit Log), save/cancel buttons.
   - `tests/e2e/citizen/empty-states.spec.ts` (12 tests): Documents categories, services sections, emergency contacts, profile info, family documents, work/tax documents.
+- **Production PWA icons**: 12 PNG icons generated from SVG source via `sharp`:
+  - Standard PWA sizes: 72, 96, 128, 144, 152, 192, 384, 512px
+  - Apple touch icon: 180x180
+  - Favicons: 16x16, 32x32
+  - Maskable variant: 512x512 with Colombia blue safe-area padding
+- **Icon generation script** (`scripts/generate-pwa-icons.mjs`): Reproducible PNG generation from SVG source.
+- Updated `manifest.json` to reference PNG icons as primary with separate maskable entry.
 
 ### Fixed
 - **WCAG 2.1 AA accessibility audit**: Comprehensive accessibility improvements across all UI components and pages.
