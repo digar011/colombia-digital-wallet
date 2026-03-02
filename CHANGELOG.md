@@ -18,6 +18,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **API response helpers** (`src/lib/utils/apiHelpers.ts`): Standardized `createApiResponse()`, `createErrorResponse()`, `ApiErrors` factory, and `withAuth()` wrapper for future API routes.
 - **CSRF token endpoint** (`src/app/api/csrf/route.ts`): GET `/api/csrf` issues tokens via double-submit cookie pattern, rate limited by `authLimiter` (10 req/min per IP).
 - **useCsrf hook** (`src/lib/hooks/useCsrf.ts`): Client-side hook that auto-fetches CSRF token on mount and provides `refreshToken` for on-demand refresh.
+- **30 new E2E tests** across 3 files (136 total test cases, 408 across 3 browser projects):
+  - `tests/e2e/auth/auth-errors.spec.ts` (10 tests): Login validation errors (empty form, invalid email, short password), phone/email toggle, register step validation, OTP page.
+  - `tests/e2e/admin/admin-settings.spec.ts` (8 tests): Settings page rendering, tab navigation (System, API Keys, Roles, Audit Log), save/cancel buttons.
+  - `tests/e2e/citizen/empty-states.spec.ts` (12 tests): Documents categories, services sections, emergency contacts, profile info, family documents, work/tax documents.
 
 ### Fixed
 - **WCAG 2.1 AA accessibility audit**: Comprehensive accessibility improvements across all UI components and pages.
