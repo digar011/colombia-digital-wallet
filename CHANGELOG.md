@@ -4,6 +4,17 @@ All notable changes to the Colombia Digital Wallet (Mi Colombia Digital) project
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] - 2026-03-01
+
+### Added
+- **Production PWA icons**: 12 PNG icons generated from SVG source via `sharp`:
+  - Standard PWA sizes: 72, 96, 128, 144, 152, 192, 384, 512px
+  - Apple touch icon: 180x180
+  - Favicons: 16x16, 32x32
+  - Maskable variant: 512x512 with Colombia blue safe-area padding
+- **Icon generation script** (`scripts/generate-pwa-icons.mjs`): Reproducible PNG generation from SVG source.
+- Updated `manifest.json` to reference PNG icons as primary with separate maskable entry.
+
 ## [Unreleased] - 2026-02-26
 
 ### Added
