@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
 
+// ─── Types ──────────────────────────────────────────────────────────────────
+
 type AdminRole = 'admin' | 'super_admin';
 
 interface AdminRoleContextValue {
@@ -10,7 +12,11 @@ interface AdminRoleContextValue {
   toggleRole: () => void;
 }
 
+// ─── Context ────────────────────────────────────────────────────────────────
+
 const AdminRoleContext = createContext<AdminRoleContextValue | null>(null);
+
+// ─── Provider ───────────────────────────────────────────────────────────────
 
 export function AdminRoleProvider({ children }: { children: React.ReactNode }) {
   const [adminRole, setAdminRole] = useState<AdminRole>('admin');
@@ -20,11 +26,19 @@ export function AdminRoleProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AdminRoleContext.Provider value={{ adminRole, isSuperAdmin: adminRole === 'super_admin', toggleRole }}>
+    <AdminRoleContext.Provider
+      value={{
+        adminRole,
+        isSuperAdmin: adminRole === 'super_admin',
+        toggleRole,
+      }}
+    >
       {children}
     </AdminRoleContext.Provider>
   );
 }
+
+// ─── Hook ───────────────────────────────────────────────────────────────────
 
 export function useAdminRole(): AdminRoleContextValue {
   const context = useContext(AdminRoleContext);

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { logAuthEvent } from '@/lib/utils/logger';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -155,6 +156,7 @@ export function useAuth() {
       // Demo validation: accept any non-empty credentials
       if (!emailOrPhone.trim() || !password.trim()) {
         setState((prev) => ({ ...prev, isLoading: false }));
+        logAuthEvent('failed_login', undefined, emailOrPhone, { reason: 'empty_credentials' });
         return { success: false, error: 'Credenciales requeridas' };
       }
 
@@ -163,6 +165,7 @@ export function useAuth() {
       if (testAccount) {
         if (password !== testAccount.password) {
           setState((prev) => ({ ...prev, isLoading: false }));
+          logAuthEvent('failed_login', undefined, emailOrPhone, { reason: 'invalid_password' });
           return { success: false, error: 'Contrasena incorrecta' };
         }
         const user = testAccount.profile;
@@ -175,11 +178,13 @@ export function useAuth() {
           // Storage unavailable
         }
         setState({ isAuthenticated: true, isLoading: false, user });
+        logAuthEvent('login', user.id, user.email);
         return { success: true };
       }
 
       if (password.length < 6) {
         setState((prev) => ({ ...prev, isLoading: false }));
+        logAuthEvent('failed_login', undefined, emailOrPhone, { reason: 'password_too_short' });
         return { success: false, error: 'La contrasena debe tener al menos 6 caracteres' };
       }
 
@@ -206,6 +211,7 @@ export function useAuth() {
         user,
       });
 
+      logAuthEvent('login', user.id, user.email);
       return { success: true };
     },
     []
@@ -253,6 +259,7 @@ export function useAuth() {
         user,
       });
 
+      logAuthEvent('register', user.id, user.email);
       return { success: true };
     },
     []
@@ -266,6 +273,8 @@ export function useAuth() {
     } catch {
       // Storage unavailable
     }
+
+    logAuthEvent('logout');
 
     setState({
       isAuthenticated: false,
