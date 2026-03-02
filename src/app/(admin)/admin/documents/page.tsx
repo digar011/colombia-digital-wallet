@@ -38,6 +38,7 @@ import {
   getDocumentTypeLabel,
   type DocumentType,
 } from '@/lib/mock/adminData';
+import { issueDocumentSchema } from '@/lib/validations/admin';
 
 // ─── Tab for this page ───────────────────────────────────────────────────────
 
@@ -56,6 +57,10 @@ export default function AdminDocumentsPage() {
     documentType: '' as DocumentType | '',
     notes: '',
   });
+  const [issueFormErrors, setIssueFormErrors] = useState<{
+    citizenId?: string;
+    documentType?: string;
+  }>({});
 
   // Search & filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -118,6 +123,31 @@ export default function AdminDocumentsPage() {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, statusFilter, typeFilter]);
+
+  // ── Issue form validation ─────────────────────────────────────
+  const validateAndSubmitIssueForm = () => {
+    const errors: { citizenId?: string; documentType?: string } = {};
+
+    const citizenResult = issueDocumentSchema.shape.citizen_id.safeParse(issueFormData.citizenId);
+    if (!citizenResult.success) {
+      errors.citizenId = citizenResult.error.issues[0]?.message ?? 'El ID del ciudadano es requerido';
+    }
+
+    const typeResult = issueDocumentSchema.shape.document_type.safeParse(issueFormData.documentType);
+    if (!typeResult.success) {
+      errors.documentType = typeResult.error.issues[0]?.message ?? 'Tipo de documento no valido';
+    }
+
+    setIssueFormErrors(errors);
+
+    if (Object.keys(errors).length > 0) return;
+
+    // Demo: simulate successful issuance
+    alert(`Documento emitido exitosamente.\n\nCiudadano: ${issueFormData.citizenId}\nTipo: ${issueFormData.documentType}\n\n(En produccion, esto crearia el documento en la base de datos.)`);
+    setShowIssueForm(false);
+    setIssueFormData({ citizenId: '', documentType: '', notes: '' });
+    setIssueFormErrors({});
+  };
 
   const hasFilters = statusFilter || typeFilter;
 
@@ -250,10 +280,16 @@ export default function AdminDocumentsPage() {
                   <div className="relative">
                     <select
                       value={issueFormData.citizenId}
-                      onChange={(e) =>
-                        setIssueFormData({ ...issueFormData, citizenId: e.target.value })
-                      }
-                      className="w-full h-10 px-3 pr-8 rounded-lg border border-gray-200 bg-white text-sm text-text-primary appearance-none focus:outline-none focus:ring-2 focus:ring-colombia-blue/30 focus:border-colombia-blue"
+                      onChange={(e) => {
+                        setIssueFormData({ ...issueFormData, citizenId: e.target.value });
+                        if (issueFormErrors.citizenId) setIssueFormErrors((prev) => ({ ...prev, citizenId: undefined }));
+                      }}
+                      aria-invalid={issueFormErrors.citizenId ? true : undefined}
+                      className={`w-full h-10 px-3 pr-8 rounded-lg border bg-white text-sm text-text-primary appearance-none focus:outline-none focus:ring-2 ${
+                        issueFormErrors.citizenId
+                          ? 'border-colombia-red focus:ring-colombia-red/30'
+                          : 'border-gray-200 focus:ring-colombia-blue/30 focus:border-colombia-blue'
+                      }`}
                     >
                       <option value="">Seleccionar ciudadano...</option>
                       {mockCitizens
@@ -266,6 +302,9 @@ export default function AdminDocumentsPage() {
                     </select>
                     <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   </div>
+                  {issueFormErrors.citizenId && (
+                    <p className="text-xs text-colombia-red font-medium mt-1" role="alert">{issueFormErrors.citizenId}</p>
+                  )}
                 </div>
 
                 {/* Document type selector */}
@@ -276,13 +315,19 @@ export default function AdminDocumentsPage() {
                   <div className="relative">
                     <select
                       value={issueFormData.documentType}
-                      onChange={(e) =>
+                      onChange={(e) => {
                         setIssueFormData({
                           ...issueFormData,
                           documentType: e.target.value as DocumentType,
-                        })
-                      }
-                      className="w-full h-10 px-3 pr-8 rounded-lg border border-gray-200 bg-white text-sm text-text-primary appearance-none focus:outline-none focus:ring-2 focus:ring-colombia-blue/30 focus:border-colombia-blue"
+                        });
+                        if (issueFormErrors.documentType) setIssueFormErrors((prev) => ({ ...prev, documentType: undefined }));
+                      }}
+                      aria-invalid={issueFormErrors.documentType ? true : undefined}
+                      className={`w-full h-10 px-3 pr-8 rounded-lg border bg-white text-sm text-text-primary appearance-none focus:outline-none focus:ring-2 ${
+                        issueFormErrors.documentType
+                          ? 'border-colombia-red focus:ring-colombia-red/30'
+                          : 'border-gray-200 focus:ring-colombia-blue/30 focus:border-colombia-blue'
+                      }`}
                     >
                       <option value="">Seleccionar tipo...</option>
                       {mockDocumentTemplates
@@ -295,6 +340,9 @@ export default function AdminDocumentsPage() {
                     </select>
                     <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   </div>
+                  {issueFormErrors.documentType && (
+                    <p className="text-xs text-colombia-red font-medium mt-1" role="alert">{issueFormErrors.documentType}</p>
+                  )}
                 </div>
 
                 {/* Notes */}
@@ -364,7 +412,7 @@ export default function AdminDocumentsPage() {
                   variant="primary"
                   size="sm"
                   leftIcon={Send}
-                  disabled={!issueFormData.citizenId || !issueFormData.documentType}
+                  onClick={validateAndSubmitIssueForm}
                 >
                   Emitir Documento
                 </Button>

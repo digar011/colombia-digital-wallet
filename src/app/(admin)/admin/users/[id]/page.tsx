@@ -47,6 +47,8 @@ import {
   getDocumentTypeLabel,
   type ActivityLogEntry,
 } from '@/lib/mock/adminData';
+import { Input } from '@/components/ui/Input';
+import { updateCitizenStatusSchema, CITIZEN_STATUSES } from '@/lib/validations/admin';
 
 // ─── Tab type ────────────────────────────────────────────────────────────────
 
@@ -195,6 +197,9 @@ export default function AdminUserDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabId>('documents');
   const [newNote, setNewNote] = useState('');
+  const [showStatusForm, setShowStatusForm] = useState(false);
+  const [statusForm, setStatusForm] = useState({ status: '', reason: '' });
+  const [statusErrors, setStatusErrors] = useState<{ status?: string; reason?: string }>({});
 
   const citizen = useMemo(
     () => mockCitizens.find((c) => c.id === citizenId) || null,
@@ -215,6 +220,28 @@ export default function AdminUserDetailPage() {
     const timer = setTimeout(() => setIsLoading(false), 400);
     return () => clearTimeout(timer);
   }, []);
+
+  const validateAndSubmitStatusChange = () => {
+    const errors: { status?: string; reason?: string } = {};
+
+    const statusResult = updateCitizenStatusSchema.shape.status.safeParse(statusForm.status);
+    if (!statusResult.success) {
+      errors.status = statusResult.error.issues[0]?.message ?? 'Estado no valido';
+    }
+
+    const reasonResult = updateCitizenStatusSchema.shape.reason.safeParse(statusForm.reason);
+    if (!reasonResult.success) {
+      errors.reason = reasonResult.error.issues[0]?.message ?? 'El motivo es requerido';
+    }
+
+    setStatusErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
+    alert(`Estado actualizado a "${statusForm.status}".\nMotivo: ${statusForm.reason}\n\n(En produccion, esto actualizaria el estado en la base de datos.)`);
+    setShowStatusForm(false);
+    setStatusForm({ status: '', reason: '' });
+    setStatusErrors({});
+  };
 
   // ── Loading state ─────────────────────────────────────────────
 
@@ -336,11 +363,27 @@ export default function AdminUserDetailPage() {
                   </Button>
                 )}
                 {citizen.status !== 'suspended' ? (
-                  <Button variant="outline" size="sm" leftIcon={Ban}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    leftIcon={Ban}
+                    onClick={() => {
+                      setStatusForm({ status: 'suspended', reason: '' });
+                      setShowStatusForm(true);
+                    }}
+                  >
                     Suspender
                   </Button>
                 ) : (
-                  <Button variant="outline" size="sm" leftIcon={Shield}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    leftIcon={Shield}
+                    onClick={() => {
+                      setStatusForm({ status: 'active', reason: '' });
+                      setShowStatusForm(true);
+                    }}
+                  >
                     Reactivar
                   </Button>
                 )}
@@ -354,6 +397,89 @@ export default function AdminUserDetailPage() {
             </div>
           </CardBody>
         </Card>
+
+        {/* ── Status Change Form ─────────────────────────────── */}
+        {showStatusForm && (
+          <Card variant="elevated" className="border-2 border-colombia-blue/20">
+            <CardBody>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold text-text-primary">
+                  Cambiar Estado del Ciudadano
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowStatusForm(false);
+                    setStatusErrors({});
+                  }}
+                  className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <XCircle className="w-4 h-4 text-gray-500" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-text-primary mb-1.5">
+                    Nuevo Estado <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={statusForm.status}
+                      onChange={(e) => {
+                        setStatusForm({ ...statusForm, status: e.target.value });
+                        if (statusErrors.status) setStatusErrors((prev) => ({ ...prev, status: undefined }));
+                      }}
+                      aria-invalid={statusErrors.status ? true : undefined}
+                      className={`w-full h-10 px-3 pr-8 rounded-lg border bg-white text-sm text-text-primary appearance-none focus:outline-none focus:ring-2 ${
+                        statusErrors.status
+                          ? 'border-colombia-red focus:ring-colombia-red/30'
+                          : 'border-gray-200 focus:ring-colombia-blue/30'
+                      }`}
+                    >
+                      <option value="">Seleccionar estado...</option>
+                      {CITIZEN_STATUSES.map((s) => (
+                        <option key={s} value={s}>
+                          {s === 'active' ? 'Activo' : s === 'suspended' ? 'Suspendido' : 'Bloqueado'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {statusErrors.status && (
+                    <p className="text-xs text-colombia-red font-medium mt-1" role="alert">{statusErrors.status}</p>
+                  )}
+                </div>
+
+                <Input
+                  label="Motivo"
+                  value={statusForm.reason}
+                  onChange={(e) => {
+                    setStatusForm({ ...statusForm, reason: e.target.value });
+                    if (statusErrors.reason) setStatusErrors((prev) => ({ ...prev, reason: undefined }));
+                  }}
+                  error={statusErrors.reason}
+                  placeholder="Motivo del cambio de estado (min. 10 caracteres)"
+                  inputSize="md"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 mt-4">
+                <Button variant="primary" size="sm" onClick={validateAndSubmitStatusChange}>
+                  Confirmar Cambio
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowStatusForm(false);
+                    setStatusErrors({});
+                  }}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </CardBody>
+          </Card>
+        )}
 
         {/* ── Tabs ────────────────────────────────────────────── */}
         <div className="border-b border-gray-200 bg-white rounded-t-xl">
