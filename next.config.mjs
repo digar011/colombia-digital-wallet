@@ -140,11 +140,28 @@ const nextConfig = {
             value: "camera=(), microphone=(), geolocation=(self)",
           },
           // Content Security Policy — restrict resource loading origins
+          //
+          // CSP hardening decisions (2026-03-02, closes #24):
+          //
+          // script-src:
+          //   - 'unsafe-eval' REMOVED — not required for production Next.js builds.
+          //     Next.js only needs eval() in development mode (hot module replacement).
+          //   - 'unsafe-inline' KEPT — Next.js App Router injects inline <script> tags
+          //     for hydration data (__NEXT_DATA__) and chunk preloading. Removing this
+          //     requires a nonce-based CSP with per-request middleware, which is a larger
+          //     effort tracked separately. See: https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy
+          //
+          // style-src:
+          //   - 'unsafe-inline' KEPT — Required by both TailwindCSS (utility classes
+          //     injected via <style> tags in dev, and Next.js applies inline styles for
+          //     font optimization and layout shift prevention). Removing this also
+          //     requires a nonce-based approach.
+          //
           {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",

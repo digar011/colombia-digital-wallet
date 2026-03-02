@@ -48,6 +48,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Avatar optimization**: Convert `<img>` tags to `next/image` in Header, AdminHeader, and AgencyHeader for built-in lazy loading, size hints, and future image optimization support.
 
 ### Fixed
+- **CSP hardened** (PR #24): Removed `'unsafe-eval'` from `script-src` directive in Content Security Policy. `eval()` is only needed by Next.js in development mode and was unnecessarily permissive for production. `'unsafe-inline'` retained for both `script-src` and `style-src` as Next.js App Router requires inline scripts for hydration; full nonce-based CSP is a future improvement.
 - **WCAG 2.1 AA accessibility audit**: Comprehensive accessibility improvements across all UI components and pages.
   - `layout.tsx`: Allow user zoom (`userScalable: true`, `maximumScale: 5`) — fixes WCAG 1.4.4 Resize Text.
   - `Button.tsx`: Add `aria-busy` when loading, `aria-hidden` on decorative icons.
