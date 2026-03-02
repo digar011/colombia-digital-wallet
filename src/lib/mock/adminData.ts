@@ -1186,6 +1186,52 @@ export const mockVerificationMethods = [
   { method: 'Knowledge-based', successRate: 87.5, totalAttempts: 8960 },
 ];
 
+// ─── Admin Staff ──────────────────────────────────────────────────────────────
+
+export interface AdminStaffMember {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: 'admin' | 'supervisor' | 'viewer';
+  status: 'active' | 'inactive';
+}
+
+export const mockAdminStaff: AdminStaffMember[] = [
+  {
+    id: 'staff-001',
+    firstName: 'Carlos',
+    lastName: 'Ramírez',
+    email: 'admin@wallet.gov.co',
+    role: 'admin',
+    status: 'active',
+  },
+  {
+    id: 'staff-002',
+    firstName: 'Laura',
+    lastName: 'Hernández',
+    email: 'supervisor@wallet.gov.co',
+    role: 'supervisor',
+    status: 'active',
+  },
+  {
+    id: 'staff-003',
+    firstName: 'Andrés',
+    lastName: 'Ospina',
+    email: 'viewer@wallet.gov.co',
+    role: 'viewer',
+    status: 'active',
+  },
+  {
+    id: 'staff-004',
+    firstName: 'María',
+    lastName: 'Toro',
+    email: 'maria.toro@wallet.gov.co',
+    role: 'supervisor',
+    status: 'inactive',
+  },
+];
+
 // ─── Helpers for formatted display ───────────────────────────────────────────
 
 export function formatNumber(n: number): string {
