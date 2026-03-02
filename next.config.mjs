@@ -1,3 +1,4 @@
+import { withSentryConfig } from "@sentry/nextjs";
 import withPWA from "next-pwa";
 
 const pwaConfig = withPWA({
@@ -54,7 +55,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.sentry.io https://*.ingest.sentry.io",
               "frame-ancestors 'none'",
             ].join("; "),
           },
@@ -64,4 +65,16 @@ const nextConfig = {
   },
 };
 
-export default pwaConfig(nextConfig);
+// Compose PWA config first, then wrap with Sentry (outermost wrapper)
+export default withSentryConfig(pwaConfig(nextConfig), {
+  // Suppress source map upload logs during build
+  silent: true,
+
+  // Sentry organization and project for source map uploads
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // Only upload source maps in CI environments
+  disableServerWebpackPlugin: !process.env.CI,
+  disableClientWebpackPlugin: !process.env.CI,
+});
