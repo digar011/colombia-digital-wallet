@@ -1,8 +1,13 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import QRCodeLib from 'react-qr-code';
+import dynamic from 'next/dynamic';
 import { Maximize2, Minimize2, RefreshCw, X } from 'lucide-react';
+
+const QRCodeLib = dynamic(() => import('react-qr-code'), {
+  ssr: false,
+  loading: () => <div className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded" style={{ width: '100%', height: '100%' }} />,
+});
 import { cn } from '@/lib/utils/cn';
 
 export interface QRCodeProps {

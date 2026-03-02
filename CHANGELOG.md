@@ -4,6 +4,13 @@ All notable changes to the Colombia Digital Wallet (Mi Colombia Digital) project
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] - 2026-03-01
+
+### Changed
+- **Performance optimization**: Dynamic import of `react-qr-code` library via `next/dynamic` — QR code is now lazy-loaded only on document detail pages, reducing initial bundle size for all other routes.
+- **Avatar optimization**: Convert `<img>` tags to `next/image` in Header, AdminHeader, and AgencyHeader for built-in lazy loading, size hints, and future image optimization support.
+- **AdminRoleContext**: Fix pre-existing build error (missing context provider).
+
 ## [Unreleased] - 2026-02-26
 
 ### Added
