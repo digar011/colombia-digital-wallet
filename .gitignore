@@ -42,3 +42,6 @@ next-env.d.ts
 # PWA generated files
 public/sw.js
 public/workbox-*.js
+
+# Sentry CLI config (may contain auth tokens)
+.sentryclirc
