@@ -60,6 +60,19 @@ function validatePassword(value: string): string | null {
   return null;
 }
 
+// ─── JSON-LD Structured Data ────────────────────────────────────────────────
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://micolombia.digital';
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Inicio', item: APP_URL },
+    { '@type': 'ListItem', position: 2, name: 'Iniciar Sesion', item: `${APP_URL}/login` },
+  ],
+};
+
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export default function LoginPage() {
@@ -119,6 +132,12 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
+      {/* JSON-LD breadcrumb structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+
       {/* ─── Top gradient accent ─────────────────────────────────── */}
       <div
         className="h-2 w-full"
