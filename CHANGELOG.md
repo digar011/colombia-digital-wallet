@@ -4,6 +4,14 @@ All notable changes to the Colombia Digital Wallet (Mi Colombia Digital) project
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] - 2026-03-01
+
+### Added
+- **30 new E2E tests** across 3 files (136 total test cases, 408 across 3 browser projects):
+  - `tests/e2e/auth/auth-errors.spec.ts` (10 tests): Login validation errors (empty form, invalid email, short password), phone/email toggle, register step validation, OTP page.
+  - `tests/e2e/admin/admin-settings.spec.ts` (8 tests): Settings page rendering, tab navigation (System, API Keys, Roles, Audit Log), save/cancel buttons.
+  - `tests/e2e/citizen/empty-states.spec.ts` (12 tests): Documents categories, services sections, emergency contacts, profile info, family documents, work/tax documents.
+
 ## [Unreleased] - 2026-02-26
 
 ### Added
