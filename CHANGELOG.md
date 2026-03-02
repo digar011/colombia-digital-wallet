@@ -4,7 +4,14 @@ All notable changes to the Colombia Digital Wallet (Mi Colombia Digital) project
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased] - 2026-02-26
+## [Unreleased] - 2026-03-01
+
+### Added
+- **Structured logging in middleware**: Route protection decisions (redirects, blocks, allows) now logged via `logger.info`/`logger.debug` with pathname and action metadata.
+- **Auth event logging**: `logAuthEvent()` wired into `useAuth` hook for login, register, logout, and failed login events with structured metadata.
+- **API response helpers** (`src/lib/utils/apiHelpers.ts`): Standardized `createApiResponse()`, `createErrorResponse()`, `ApiErrors` factory, and `withAuth()` wrapper for future API routes.
+
+## [0.4.0] - 2026-02-26
 
 ### Added
 - Security headers in `next.config.mjs`: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-DNS-Prefetch-Control.
