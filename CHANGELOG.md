@@ -4,9 +4,22 @@ All notable changes to the Colombia Digital Wallet (Mi Colombia Digital) project
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased] - 2026-03-01
+## [Unreleased] - 2026-03-02
 
 ### Added
+- **21 API route handlers** (PR #11): auth (login, register, logout), citizen (profile, documents, vehicles, health, family, work, appointments, notifications), admin (citizens CRUD, documents, analytics, activity), and public verify endpoints — all using mock data with standardized response format `{ success, data, meta }`.
+- **Server-side Zod validation** (PR #11): All mutation endpoints validate request bodies with existing Zod schemas (`loginSchema`, `registerSchema`, `updateProfileSchema`, `appointmentBookingSchema`, `issueDocumentSchema`, `updateCitizenStatusSchema`) and return 422 with Spanish error details on failure.
+- **CSRF protection on state-changing routes** (PR #11): `csrfProtect()` integrated into all POST/PUT API routes, returning 403 on token mismatch.
+- **Structured logging in all API routes** (PR #11): `logApiRequest()`, `logAuthEvent()`, and `logDocumentAccess()` wired into every route with request timing and user context.
+- **Rate limiting on all API routes** (PR #11): `authLimiter` (10/min), `citizenApiLimiter` (100/min), `adminLimiter` (500/min), `verificationLimiter` (1000/min) applied to appropriate route groups with 429 responses and `Retry-After` headers.
+- **React Query hooks for all API endpoints** (PR #12): `useCitizenProfile`, `useCitizenDocuments`, `useCitizenVehicles`, `useCitizenHealth`, `useCitizenFamily`, `useCitizenWork`, `useCitizenAppointments`, `useCitizenNotifications`, `useAdminCitizens`, `useAdminAnalytics`, `useAdminActivity`, `useVerifyDocument` — with query key factories (`citizenKeys`, `adminKeys`, `verifyKeys`) and automatic cache invalidation on mutations.
+- **Type-safe API client** (PR #12): `fetchApi<T>()` utility with `ApiError` class for standardized error handling across all hooks.
+- **Sentry error monitoring** (PR #9): `@sentry/nextjs` configured for client, server, and edge runtimes with performance tracing (10% production sampling), session replay, and source map uploads in CI.
+- **Global error boundary** (PR #9): `global-error.tsx` with Spanish UI that captures exceptions to Sentry and offers retry.
+- **Offline caching strategies** (PR #10): Runtime caching rules in `next-pwa` — `NetworkFirst` for API/pages (24h), `CacheFirst` for images (30d) and fonts (1y), `StaleWhileRevalidate` for JS/CSS (7d).
+- **Offline fallback page** (PR #10): `/offline` route with Spanish UI shown when navigation fails without connectivity.
+- **useOfflineStatus hook** (PR #10): Tracks `navigator.onLine` status with event listeners.
+- **OfflineBanner component** (PR #10): Amber warning banner displayed at top of layout when user goes offline.
 - **Zod validation wired into citizen and admin forms**: Profile edit form with `updateProfileSchema`, appointment booking form with `appointmentBookingSchema`, admin document issuance with `issueDocumentSchema`, admin user search with `searchCitizensSchema`, admin user status change with `updateCitizenStatusSchema`.
 - **Profile edit mode**: Inline editing for phone, email, address, city, and department with real-time Zod validation and Spanish error messages.
 - **Appointment booking form**: Service type selector, date/time pickers, and notes field with full validation replacing the placeholder alert.
