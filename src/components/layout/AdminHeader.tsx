@@ -85,6 +85,9 @@ function AdminUserMenu({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+        aria-label="Menu de usuario"
         className={cn(
           'flex items-center gap-2 px-2 py-1.5 rounded-lg',
           'transition-colors duration-200',
@@ -135,21 +138,23 @@ function AdminUserMenu({
           </div>
 
           {/* Menu items */}
-          <div className="py-1">
+          <div className="py-1" role="menu" aria-label="Opciones de usuario">
             <Link
               href="/admin/settings"
               onClick={() => setIsOpen(false)}
+              role="menuitem"
               className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
-              <User size={16} />
+              <User size={16} aria-hidden="true" />
               Mi Perfil
             </Link>
             <Link
               href="/admin/settings"
               onClick={() => setIsOpen(false)}
+              role="menuitem"
               className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
-              <Settings size={16} />
+              <Settings size={16} aria-hidden="true" />
               Configuración
             </Link>
           </div>
@@ -158,9 +163,10 @@ function AdminUserMenu({
           <div className="border-t border-gray-100 dark:border-gray-800 pt-1">
             <button
               type="button"
+              role="menuitem"
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-colombia-red hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
             >
-              <LogOut size={16} />
+              <LogOut size={16} aria-hidden="true" />
               Cerrar Sesión
             </button>
           </div>
@@ -220,6 +226,7 @@ export function AdminHeader({
                     <ChevronRight
                       size={14}
                       className="text-gray-400 flex-shrink-0 mx-1"
+                      aria-hidden="true"
                     />
                   )}
                   <li>
@@ -259,10 +266,12 @@ export function AdminHeader({
             <Search
               size={16}
               className="text-gray-400 flex-shrink-0"
+              aria-hidden="true"
             />
             <input
               type="text"
               placeholder="Buscar..."
+              aria-label="Buscar en el panel administrativo"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
@@ -278,8 +287,9 @@ export function AdminHeader({
                 type="button"
                 onClick={() => setSearchQuery('')}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                aria-label="Limpiar busqueda"
               >
-                <span className="text-xs">ESC</span>
+                <span className="text-xs" aria-hidden="true">ESC</span>
               </button>
             )}
           </div>
@@ -291,6 +301,8 @@ export function AdminHeader({
           <button
             type="button"
             onClick={toggleRole}
+            aria-pressed={isSuperAdmin}
+            aria-label={isSuperAdmin ? 'Modo Super Admin activo, cambiar a Admin' : 'Modo Admin activo, cambiar a Super Admin'}
             className={cn(
               'hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg',
               'transition-all duration-200 text-xs font-semibold',

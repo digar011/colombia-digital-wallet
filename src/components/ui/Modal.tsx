@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef, useId } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
@@ -39,6 +39,9 @@ function Modal({
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
+  const uniqueId = useId();
+  const titleId = `modal-title-${uniqueId}`;
+  const descriptionId = `modal-description-${uniqueId}`;
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -104,8 +107,8 @@ function Modal({
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
-      aria-labelledby={title ? 'modal-title' : undefined}
-      aria-describedby={description ? 'modal-description' : undefined}
+      aria-labelledby={title ? titleId : undefined}
+      aria-describedby={description ? descriptionId : undefined}
     >
       {/* Overlay */}
       <div
@@ -131,7 +134,7 @@ function Modal({
             <div className="flex-1 min-w-0">
               {title && (
                 <h2
-                  id="modal-title"
+                  id={titleId}
                   className="text-lg font-semibold text-text-primary dark:text-text-primary-dark truncate pr-2"
                 >
                   {title}
@@ -139,7 +142,7 @@ function Modal({
               )}
               {description && (
                 <p
-                  id="modal-description"
+                  id={descriptionId}
                   className="text-sm text-text-secondary dark:text-text-secondary-dark mt-1"
                 >
                   {description}

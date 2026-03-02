@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { logger } from '@/lib/utils/logger';
 
 // Routes that do NOT require citizen authentication
 const PUBLIC_PATHS = ['/login', '/register', '/verify', '/'];
@@ -32,6 +33,7 @@ export function middleware(request: NextRequest) {
 
   // Always allow API routes
   if (pathname.startsWith(API_PREFIX)) {
+    logger.debug('Middleware: allowing API route', { pathname });
     return NextResponse.next();
   }
 
@@ -48,16 +50,19 @@ export function middleware(request: NextRequest) {
   if (isAgencyPath(pathname)) {
     // Agency portal and login pages are always accessible
     if (isAgencyPublicPath(pathname)) {
+      logger.debug('Middleware: allowing public agency route', { pathname });
       return NextResponse.next();
     }
 
     // Protected agency pages require agency-token cookie
     const agencyToken = request.cookies.get('agency-token')?.value;
     if (!agencyToken) {
+      logger.info('Middleware: agency auth redirect — no token', { pathname, action: 'redirect', target: '/agency/login' });
       const loginUrl = new URL('/agency/login', request.url);
       return NextResponse.redirect(loginUrl);
     }
 
+    logger.debug('Middleware: agency route allowed', { pathname });
     return NextResponse.next();
   }
 
@@ -68,6 +73,7 @@ export function middleware(request: NextRequest) {
 
   // If NOT authenticated and trying to access a protected route -> redirect to login
   if (!isAuthenticated && !isPublic) {
+    logger.info('Middleware: unauthenticated access blocked', { pathname, action: 'redirect', target: '/login' });
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);
@@ -75,9 +81,11 @@ export function middleware(request: NextRequest) {
 
   // If authenticated and trying to access an auth page -> redirect to dashboard
   if (isAuthenticated && isPublic && pathname !== '/') {
+    logger.info('Middleware: authenticated user redirected from auth page', { pathname, action: 'redirect', target: '/dashboard' });
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
+  logger.debug('Middleware: route allowed', { pathname, isAuthenticated });
   return NextResponse.next();
 }
 

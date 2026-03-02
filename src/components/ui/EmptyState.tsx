@@ -40,6 +40,7 @@ function EmptyState({
           'flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800',
           compact ? 'w-12 h-12 mb-3' : 'w-16 h-16 mb-4'
         )}
+        aria-hidden="true"
       >
         <Icon
           size={compact ? 24 : 32}

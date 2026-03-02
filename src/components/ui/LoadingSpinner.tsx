@@ -26,8 +26,8 @@ function LoadingSpinner({
   const { container, ring } = sizeMap[size];
 
   const spinner = (
-    <div className={cn('flex flex-col items-center gap-3', className)}>
-      <div className={cn('relative', container)}>
+    <div className={cn('flex flex-col items-center gap-3', className)} role="status" aria-label={label || 'Cargando'}>
+      <div className={cn('relative', container)} aria-hidden="true">
         {/* Outer ring - Colombia yellow */}
         <div
           className={cn(
