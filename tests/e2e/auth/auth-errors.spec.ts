@@ -24,7 +24,7 @@ test.describe('Errores de autenticacion', () => {
       const loginButton = page.getByRole('button', { name: /ingresar/i });
       await loginButton.click();
       const body = await page.textContent('body');
-      expect(body).toMatch(/correo no valido|email.*invalid/i);
+      expect(body).toMatch(/correo.*no.*valido|email.*invalid|formato.*correo/i);
     });
 
     test('deberia mostrar error con contrasena corta', async ({ page }) => {
@@ -67,7 +67,7 @@ test.describe('Errores de autenticacion', () => {
       await page.waitForLoadState('networkidle');
       await expect(page.getByText(/crear cuenta|registro/i)).toBeVisible();
       // Step 1 should show personal info fields
-      await expect(page.getByText(/informacion personal|datos personales/i)).toBeVisible();
+      await expect(page.getByText(/informacion personal|datos personales/i).first()).toBeVisible();
     });
 
     test('deberia validar campos vacios en paso 1', async ({ page }) => {

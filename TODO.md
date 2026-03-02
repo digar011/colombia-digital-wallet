@@ -4,7 +4,7 @@
 > For detailed descriptions, dependencies, and file-level instructions, see `docs/TODO_QUEUE.md`.
 > For full rationale behind each change, see `docs/PRODUCTION_ROADMAP.md`.
 >
-> Last Updated: 2026-02-28
+> Last Updated: 2026-03-01
 
 ---
 
@@ -19,23 +19,19 @@
 ### P1 -- Critical
 
 - [ ] End-to-end RLS verification with real Supabase Auth tokens across all 12 tables
-- [ ] Wire Zod validation schemas into all API routes (server-side) and form components (client-side)
-- [ ] Integrate CSRF protection into state-changing API routes
-- [ ] Set up Sentry error monitoring (`@sentry/nextjs`)
-- [ ] Implement structured server-side logging in API routes (audit trail for document access)
+- [ ] Wire Zod validation schemas into all API routes (server-side) — client-side forms done
+- [ ] Integrate CSRF protection into state-changing API routes — CSRF endpoint + hook done
+- [ ] Set up Sentry error monitoring (`@sentry/nextjs`) — deferred
+- [ ] Implement structured server-side logging in API routes — middleware + auth logging done
 
 ### P2 -- High
 
-- [ ] Generate production PWA icons (replace placeholder SVGs with proper app logo assets)
 - [ ] Implement service worker with `next-pwa` for offline document caching
-- [ ] Expand E2E test coverage (admin flows, error states, accessibility tests with axe)
-- [ ] WCAG 2.1 AA accessibility audit (Lighthouse, screen reader testing, keyboard navigation)
 
 ### P3 -- Medium
 
-- [ ] Rate limiting on auth and verification endpoints (apply `src/lib/middleware/rateLimit.ts` to API routes)
-- [ ] Performance optimization (Lighthouse audit, bundle analysis, image optimization)
-- [ ] Load testing with k6 or Artillery (target: 10,000 concurrent users)
+- [ ] Rate limiting on API routes — infrastructure ready, CSRF endpoint rate-limited as reference
+- [ ] Load testing with k6 or Artillery (target: 10,000 concurrent users) — deferred
 - [ ] API key management for external agency integrations
 
 ---
@@ -47,6 +43,17 @@
 ---
 
 ## Completed
+
+### Validation, Logging, Security, A11y, Tests, PWA, Performance (2026-03-01)
+- [x] Wire Zod validation into citizen and admin forms (profile, booking, documents, users, status) — PR #2
+- [x] Wire structured logging into middleware and auth hook (`logAuthEvent`) — PR #3
+- [x] Create API response helpers (`apiHelpers.ts`) for future route standardization — PR #3
+- [x] CSRF token endpoint (`/api/csrf`) with rate limiting + `useCsrf` client hook — PR #4
+- [x] WCAG 2.1 AA accessibility audit: layout zoom, Button/Input/Modal/LoadingSpinner/EmptyState/AdminHeader/Dashboard a11y fixes — PR #5
+- [x] Expand E2E test coverage: 30 new tests (auth errors, admin settings, citizen empty states) — 136 total test cases — PR #6
+- [x] Generate production PWA icons: 12 PNGs from SVG via sharp, updated manifest.json with maskable entry — PR #7
+- [x] Performance optimization: dynamic import react-qr-code, convert img to next/image in headers — PR #8
+- [x] Fix pre-existing build error: create missing `AdminRoleContext.tsx`
 
 ### Standardization (2026-02-28)
 - [x] Create `ONBOARDING.md` at project root
