@@ -74,15 +74,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         disabled={isDisabled}
         aria-disabled={isDisabled || undefined}
+        aria-busy={isLoading || undefined}
         {...props}
       >
         {isLoading ? (
-          <Loader2 size={iconSize} className="animate-spin" />
+          <Loader2 size={iconSize} className="animate-spin" aria-hidden="true" />
         ) : LeftIcon ? (
-          <LeftIcon size={iconSize} />
+          <LeftIcon size={iconSize} aria-hidden="true" />
         ) : null}
         {children}
-        {!isLoading && RightIcon && <RightIcon size={iconSize} />}
+        {!isLoading && RightIcon && <RightIcon size={iconSize} aria-hidden="true" />}
       </button>
     );
   }

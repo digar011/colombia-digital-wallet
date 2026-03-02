@@ -81,7 +81,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <div className="relative">
           {LeftIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary dark:text-text-secondary-dark pointer-events-none">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary dark:text-text-secondary-dark pointer-events-none" aria-hidden="true">
               <LeftIcon size={iconSize} />
             </div>
           )}
@@ -134,8 +134,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                   : 'pointer-events-none'
               )}
               onClick={onRightIconClick}
+              onKeyDown={onRightIconClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onRightIconClick(); } } : undefined}
               role={onRightIconClick ? 'button' : undefined}
-              tabIndex={onRightIconClick ? -1 : undefined}
+              tabIndex={onRightIconClick ? 0 : undefined}
             >
               <RightIcon size={iconSize} />
             </div>
