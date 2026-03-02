@@ -7,7 +7,7 @@
 .DEFAULT_GOAL := help
 
 # All targets are phony (not file-based)
-.PHONY: help dev build start clean install test test-coverage typecheck lint lint-fix ci e2e e2e-install e2e-ui e2e-headed
+.PHONY: help dev build start clean install test test-coverage typecheck lint lint-fix ci e2e e2e-prod e2e-install e2e-ui e2e-headed
 
 # -----------------------------------------------------------------------------
 # Help
@@ -72,6 +72,9 @@ test-coverage: ## Run unit tests with coverage report (placeholder)
 
 e2e: ## Run Playwright E2E tests (all browser projects)
 	npm run test:e2e
+
+e2e-prod: build ## Run E2E tests against production build
+	npx playwright test --config=playwright.prod.config.ts
 
 e2e-install: ## Install Playwright browsers (first-time setup)
 	npx playwright install --with-deps
