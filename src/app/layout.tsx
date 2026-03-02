@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
+import { OfflineBanner } from '@/components/ui/OfflineBanner';
 
 // ─── Font ───────────────────────────────────────────────────────────────────
 
@@ -85,6 +86,7 @@ export default function RootLayout({
           Saltar al contenido principal
         </a>
         <Providers>
+          <OfflineBanner />
           {children}
         </Providers>
       </body>
