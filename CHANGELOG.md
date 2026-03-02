@@ -30,6 +30,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Icon generation script** (`scripts/generate-pwa-icons.mjs`): Reproducible PNG generation from SVG source.
 - Updated `manifest.json` to reference PNG icons as primary with separate maskable entry.
 
+### Changed
+- **Performance optimization**: Dynamic import of `react-qr-code` library via `next/dynamic` — QR code is now lazy-loaded only on document detail pages, reducing initial bundle size for all other routes.
+- **Avatar optimization**: Convert `<img>` tags to `next/image` in Header, AdminHeader, and AgencyHeader for built-in lazy loading, size hints, and future image optimization support.
+
 ### Fixed
 - **WCAG 2.1 AA accessibility audit**: Comprehensive accessibility improvements across all UI components and pages.
   - `layout.tsx`: Allow user zoom (`userScalable: true`, `maximumScale: 5`) — fixes WCAG 1.4.4 Resize Text.

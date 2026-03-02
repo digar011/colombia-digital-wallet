@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Bell, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { useCountry } from '@/lib/contexts/CountryContext';
@@ -166,12 +167,14 @@ export function Header({
             aria-label="Ir al perfil"
           >
             {avatarUrl && !imageError ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={avatarUrl}
                 alt={userName || 'Avatar'}
+                width={32}
+                height={32}
                 className="w-full h-full object-cover"
                 onError={handleImageError}
+                unoptimized
               />
             ) : (
               <div

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, Fragment } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Search,
   ChevronRight,
@@ -121,11 +122,13 @@ function AgencyUserMenu({
         )}
       >
         {avatarUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={avatarUrl}
             alt={userName}
+            width={32}
+            height={32}
             className="w-8 h-8 rounded-full object-cover"
+            unoptimized
           />
         ) : (
           <div
