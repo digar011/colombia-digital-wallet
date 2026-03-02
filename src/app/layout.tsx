@@ -63,6 +63,40 @@ export const viewport: Viewport = {
   ],
 };
 
+// ─── JSON-LD Structured Data ────────────────────────────────────────────────
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://micolombia.digital';
+
+const governmentOrganizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'GovernmentOrganization',
+  name: 'Mi Colombia Digital',
+  description: 'Billetera digital de documentos ciudadanos para Colombia',
+  url: APP_URL,
+  logo: `${APP_URL}/icons/icon-512x512.png`,
+  areaServed: {
+    '@type': 'Country',
+    name: 'Colombia',
+  },
+  availableLanguage: 'es',
+};
+
+const webApplicationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'Mi Colombia Digital',
+  description:
+    'Tu billetera digital de documentos ciudadanos. Segura, verificable y siempre disponible.',
+  url: APP_URL,
+  applicationCategory: 'GovernmentApplication',
+  operatingSystem: 'Any',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'COP',
+  },
+};
+
 // ─── Root Layout ────────────────────────────────────────────────────────────
 
 export default function RootLayout({
@@ -77,6 +111,16 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
+
+        {/* JSON-LD structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(governmentOrganizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationJsonLd) }}
+        />
       </head>
       <body className="font-sans antialiased bg-background text-foreground">
         <a
