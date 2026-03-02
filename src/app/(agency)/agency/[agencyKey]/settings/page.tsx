@@ -16,7 +16,6 @@ import {
   Search,
   Download,
   Eye,
-  EyeOff,
   Copy,
   Edit3,
   type LucideIcon,
@@ -57,7 +56,6 @@ export default function AgencySettingsPage() {
   const [tab, setTab] = useState<SettingsTab>('general');
   const [saved, setSaved] = useState(false);
   const [auditQ, setAuditQ] = useState('');
-  const [showApiKey, setShowApiKey] = useState(false);
 
   const agencyKey = (params?.agencyKey as string) || 'identity';
   const validKey: AgencyKey = isValidAgencyKey(agencyKey) ? agencyKey : 'identity';
@@ -121,8 +119,7 @@ export default function AgencySettingsPage() {
       )
     : auditLog;
 
-  const maskedApiKey = 'sk-ag-****-****-****-************';
-  const realApiKey = 'sk-ag-7f3a92bc-d4e5-6789-abcd-ef0123456789';
+  const maskedApiKey = 'sk-ag-••••-••••-••••-••••••••••••';
 
   // ── Loading state ─────────────────────────────────────────────
   if (loading) {
@@ -617,24 +614,14 @@ export default function AgencySettingsPage() {
                       </h4>
                       <div className="flex items-center gap-2">
                         <code className="text-xs bg-gray-100 px-3 py-1.5 rounded-md font-mono text-text-secondary flex-1">
-                          {showApiKey ? realApiKey : maskedApiKey}
+                          {maskedApiKey}
                         </code>
-                        <button
-                          onClick={() => setShowApiKey(!showApiKey)}
-                          className="p-1.5 rounded hover:bg-gray-100 transition-colors"
-                        >
-                          {showApiKey ? (
-                            <EyeOff className="w-4 h-4 text-gray-500" />
-                          ) : (
-                            <Eye className="w-4 h-4 text-gray-500" />
-                          )}
-                        </button>
                         <button className="p-1.5 rounded hover:bg-gray-100 transition-colors">
                           <Copy className="w-4 h-4 text-gray-500" />
                         </button>
                       </div>
                       <p className="text-[10px] text-text-secondary mt-1">
-                        Use esta clave para integrar sistemas externos con la agencia
+                        La clave API sera generada cuando la integracion este configurada
                       </p>
                     </div>
                   </div>
