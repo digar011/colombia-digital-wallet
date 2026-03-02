@@ -15,8 +15,9 @@ Welcome to the Mi Colombia Digital project! This guide will walk you through eve
 9. [Database & Supabase](#database--supabase)
 10. [Testing Guide](#testing-guide)
 11. [Deployment](#deployment)
-12. [Common Tasks](#common-tasks)
-13. [Troubleshooting](#troubleshooting)
+12. [Sentry Error Monitoring](#sentry-error-monitoring)
+13. [Common Tasks](#common-tasks)
+14. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -435,10 +436,83 @@ config/country-switch.spec.ts  — Multi-country switching
 | `NEXT_PUBLIC_ENABLE_MOCK_DATA` | No | Enable mock data mode (default: `true`) |
 | `NEXT_PUBLIC_ENABLE_OFFLINE_MODE` | No | Enable offline/PWA mode (default: `true`) |
 | `NEXT_PUBLIC_ENABLE_BIOMETRIC_AUTH` | No | Enable biometric auth (default: `false`) |
+| `NEXT_PUBLIC_SENTRY_DSN` | Production | Sentry DSN for error monitoring |
+| `SENTRY_ORG` | CI | Sentry organization slug (source map uploads) |
+| `SENTRY_PROJECT` | CI | Sentry project slug (source map uploads) |
+| `SENTRY_AUTH_TOKEN` | CI | Sentry auth token (source map uploads) |
 
 ---
 
-## 12. Common Tasks
+## 12. Sentry Error Monitoring
+
+The project uses [Sentry](https://sentry.io) via `@sentry/nextjs` to capture runtime errors across client, server, and edge runtimes. Sentry is configured in three files at the project root:
+
+- `sentry.client.config.ts` -- Browser-side error tracking with session replay
+- `sentry.server.config.ts` -- Node.js server-side error tracking
+- `sentry.edge.config.ts` -- Edge runtime error tracking
+
+Sentry is **only enabled in production** (`NODE_ENV === 'production'`). In development, errors are logged to the console as usual.
+
+### Setting Up Sentry
+
+1. **Create a Sentry project** at [sentry.io](https://sentry.io):
+   - Sign up or log in to your Sentry account
+   - Create a new project and select **Next.js** as the platform
+   - Note your **organization slug** and **project slug** from the URL (e.g., `https://sentry.io/organizations/{org}/projects/{project}/`)
+
+2. **Copy the DSN** from **Project Settings > Client Keys (DSN)**:
+   - The DSN looks like `https://abc123@o456.ingest.sentry.io/789`
+
+3. **Add environment variables** to `.env.local`:
+   ```bash
+   # Required for error monitoring in production
+   NEXT_PUBLIC_SENTRY_DSN=https://your-dsn@o123.ingest.sentry.io/456
+
+   # Required for source map uploads in CI
+   SENTRY_ORG=your-org-slug
+   SENTRY_PROJECT=your-project-slug
+   SENTRY_AUTH_TOKEN=sntrys_your-auth-token-here
+   ```
+
+4. **Generate an auth token** (for CI source map uploads):
+   - Go to **Settings > Auth Tokens** in Sentry
+   - Create a token with `project:releases` and `org:read` scopes
+   - Add `SENTRY_AUTH_TOKEN` to your CI environment variables (e.g., Vercel or GitHub Actions secrets)
+
+### How It Works
+
+| Feature | Details |
+|---------|---------|
+| **Error capture** | Unhandled exceptions are automatically sent to Sentry in production |
+| **Performance tracing** | 10% of production transactions are sampled (`tracesSampleRate: 0.1`) |
+| **Session replay** | 10% of sessions recorded; 100% of sessions with errors (`replaysOnErrorSampleRate: 1.0`) |
+| **Source maps** | Automatically uploaded during CI builds when `SENTRY_AUTH_TOKEN` is set and `CI=true` |
+| **Global error boundary** | `global-error.tsx` catches React rendering errors, reports to Sentry, and shows a Spanish retry UI |
+
+### Source Map Uploads
+
+Source maps are uploaded to Sentry **only in CI environments** (when the `CI` environment variable is set). This is controlled in `next.config.mjs`:
+
+```javascript
+disableServerWebpackPlugin: !process.env.CI,
+disableClientWebpackPlugin: !process.env.CI,
+```
+
+For Vercel deployments, `CI=true` is set automatically. For GitHub Actions, add `SENTRY_AUTH_TOKEN` to your repository secrets.
+
+### CSP Configuration
+
+The Content-Security-Policy in `next.config.mjs` already allows connections to Sentry:
+
+```
+connect-src 'self' ... https://*.sentry.io https://*.ingest.sentry.io
+```
+
+No additional CSP changes are needed.
+
+---
+
+## 13. Common Tasks
 
 ### Add a new document type
 
@@ -465,7 +539,7 @@ config/country-switch.spec.ts  — Multi-country switching
 
 ---
 
-## 13. Troubleshooting
+## 14. Troubleshooting
 
 ### Common Issues
 

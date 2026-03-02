@@ -91,6 +91,10 @@ The app runs in mock mode by default -- no Supabase connection required. Set `NE
 | `NEXT_PUBLIC_ENABLE_MOCK_DATA` | No | Enable mock data mode. Default: `true` |
 | `NEXT_PUBLIC_ENABLE_OFFLINE_MODE` | No | Enable offline/PWA mode. Default: `true` |
 | `NEXT_PUBLIC_ENABLE_BIOMETRIC_AUTH` | No | Enable biometric auth. Default: `false` |
+| `NEXT_PUBLIC_SENTRY_DSN` | Production | Sentry DSN for error monitoring (client + server + edge) |
+| `SENTRY_ORG` | CI | Sentry organization slug (for source map uploads) |
+| `SENTRY_PROJECT` | CI | Sentry project slug (for source map uploads) |
+| `SENTRY_AUTH_TOKEN` | CI | Sentry auth token (for CI source map uploads) |
 
 ## Scripts
 

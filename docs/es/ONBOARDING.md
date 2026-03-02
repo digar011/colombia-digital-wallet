@@ -15,8 +15,9 @@ Bienvenido al proyecto Mi Colombia Digital! Esta guia te llevara paso a paso por
 9. [Base de Datos y Supabase](#base-de-datos-y-supabase)
 10. [Guia de Pruebas (Testing)](#guia-de-pruebas-testing)
 11. [Despliegue](#despliegue)
-12. [Tareas Comunes](#tareas-comunes)
-13. [Solucion de Problemas](#solucion-de-problemas)
+12. [Monitoreo de Errores con Sentry](#monitoreo-de-errores-con-sentry)
+13. [Tareas Comunes](#tareas-comunes)
+14. [Solucion de Problemas](#solucion-de-problemas)
 
 ---
 
@@ -447,10 +448,83 @@ config/country-switch.spec.ts  — Cambio de pais multi-pais
 | `NEXT_PUBLIC_ENABLE_MOCK_DATA` | No | Habilitar modo de datos mock (`true`) |
 | `NEXT_PUBLIC_ENABLE_OFFLINE_MODE` | No | Habilitar modo offline/PWA (`true`) |
 | `NEXT_PUBLIC_ENABLE_BIOMETRIC_AUTH` | No | Habilitar auth biometrica (`false`) |
+| `NEXT_PUBLIC_SENTRY_DSN` | Produccion | DSN de Sentry para monitoreo de errores |
+| `SENTRY_ORG` | CI | Slug de la organizacion en Sentry (carga de source maps) |
+| `SENTRY_PROJECT` | CI | Slug del proyecto en Sentry (carga de source maps) |
+| `SENTRY_AUTH_TOKEN` | CI | Token de autenticacion de Sentry (carga de source maps) |
 
 ---
 
-## 12. Tareas Comunes
+## 12. Monitoreo de Errores con Sentry
+
+El proyecto usa [Sentry](https://sentry.io) a traves de `@sentry/nextjs` para capturar errores en tiempo de ejecucion en los runtimes de cliente, servidor y edge. Sentry esta configurado en tres archivos en la raiz del proyecto:
+
+- `sentry.client.config.ts` -- Rastreo de errores del lado del navegador con replay de sesion
+- `sentry.server.config.ts` -- Rastreo de errores del lado del servidor (Node.js)
+- `sentry.edge.config.ts` -- Rastreo de errores en el runtime edge
+
+Sentry esta **habilitado solo en produccion** (`NODE_ENV === 'production'`). En desarrollo, los errores se registran en la consola como de costumbre.
+
+### Configuracion de Sentry
+
+1. **Crear un proyecto en Sentry** en [sentry.io](https://sentry.io):
+   - Registrarse o iniciar sesion en tu cuenta de Sentry
+   - Crear un nuevo proyecto y seleccionar **Next.js** como plataforma
+   - Anotar el **slug de la organizacion** y el **slug del proyecto** de la URL (ej: `https://sentry.io/organizations/{org}/projects/{project}/`)
+
+2. **Copiar el DSN** desde **Project Settings > Client Keys (DSN)**:
+   - El DSN tiene el formato `https://abc123@o456.ingest.sentry.io/789`
+
+3. **Agregar variables de entorno** a `.env.local`:
+   ```bash
+   # Requerido para monitoreo de errores en produccion
+   NEXT_PUBLIC_SENTRY_DSN=https://tu-dsn@o123.ingest.sentry.io/456
+
+   # Requerido para carga de source maps en CI
+   SENTRY_ORG=tu-slug-organizacion
+   SENTRY_PROJECT=tu-slug-proyecto
+   SENTRY_AUTH_TOKEN=sntrys_tu-token-aqui
+   ```
+
+4. **Generar un token de autenticacion** (para carga de source maps en CI):
+   - Ir a **Settings > Auth Tokens** en Sentry
+   - Crear un token con los permisos `project:releases` y `org:read`
+   - Agregar `SENTRY_AUTH_TOKEN` a las variables de entorno de CI (ej: secretos de Vercel o GitHub Actions)
+
+### Como Funciona
+
+| Funcionalidad | Detalles |
+|----------------|---------|
+| **Captura de errores** | Las excepciones no manejadas se envian automaticamente a Sentry en produccion |
+| **Rastreo de rendimiento** | Se muestrea el 10% de las transacciones en produccion (`tracesSampleRate: 0.1`) |
+| **Replay de sesion** | 10% de sesiones grabadas; 100% de sesiones con errores (`replaysOnErrorSampleRate: 1.0`) |
+| **Source maps** | Se cargan automaticamente durante los builds de CI cuando `SENTRY_AUTH_TOKEN` esta configurado y `CI=true` |
+| **Error boundary global** | `global-error.tsx` captura errores de renderizado React, reporta a Sentry y muestra una UI de reintento en espanol |
+
+### Carga de Source Maps
+
+Los source maps se cargan a Sentry **solo en entornos de CI** (cuando la variable de entorno `CI` esta configurada). Esto se controla en `next.config.mjs`:
+
+```javascript
+disableServerWebpackPlugin: !process.env.CI,
+disableClientWebpackPlugin: !process.env.CI,
+```
+
+Para despliegues en Vercel, `CI=true` se configura automaticamente. Para GitHub Actions, agrega `SENTRY_AUTH_TOKEN` a los secretos del repositorio.
+
+### Configuracion de CSP
+
+La Content-Security-Policy en `next.config.mjs` ya permite conexiones a Sentry:
+
+```
+connect-src 'self' ... https://*.sentry.io https://*.ingest.sentry.io
+```
+
+No se necesitan cambios adicionales en el CSP.
+
+---
+
+## 13. Tareas Comunes
 
 ### Agregar un nuevo tipo de documento
 
@@ -477,7 +551,7 @@ config/country-switch.spec.ts  — Cambio de pais multi-pais
 
 ---
 
-## 13. Solucion de Problemas
+## 14. Solucion de Problemas
 
 ### Problemas Comunes
 
