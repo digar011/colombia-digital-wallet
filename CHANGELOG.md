@@ -16,6 +16,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Structured logging in middleware**: Route protection decisions (redirects, blocks, allows) now logged via `logger.info`/`logger.debug` with pathname and action metadata.
 - **Auth event logging**: `logAuthEvent()` wired into `useAuth` hook for login, register, logout, and failed login events with structured metadata.
 - **API response helpers** (`src/lib/utils/apiHelpers.ts`): Standardized `createApiResponse()`, `createErrorResponse()`, `ApiErrors` factory, and `withAuth()` wrapper for future API routes.
+- **CSRF token endpoint** (`src/app/api/csrf/route.ts`): GET `/api/csrf` issues tokens via double-submit cookie pattern, rate limited by `authLimiter` (10 req/min per IP).
+- **useCsrf hook** (`src/lib/hooks/useCsrf.ts`): Client-side hook that auto-fetches CSRF token on mount and provides `refreshToken` for on-demand refresh.
 
 ## [0.4.0] - 2026-02-26
 
