@@ -261,7 +261,7 @@ export default function DocumentsPage() {
 
       {/* ── Document count ── */}
       {filteredDocuments.length > 0 && (
-        <div className="px-4 mt-4">
+        <div className="px-4 mt-4" aria-live="polite" role="status">
           <p className="text-xs text-text-secondary dark:text-text-secondary-dark text-center">
             {filteredDocuments.length} documento{filteredDocuments.length !== 1 ? 's' : ''}{' '}
             {activeFilter !== 'all' ? `en ${filterOptions.find((f) => f.key === activeFilter)?.label}` : 'total'}

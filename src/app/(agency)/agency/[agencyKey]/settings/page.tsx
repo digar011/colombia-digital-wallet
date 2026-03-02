@@ -153,8 +153,8 @@ export default function AgencySettingsPage() {
           </p>
         </div>
         {saved && (
-          <div className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-lg border border-green-200 animate-fade-in">
-            <CheckCircle2 className="w-4 h-4" />
+          <div role="status" aria-live="polite" className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-lg border border-green-200 animate-fade-in">
+            <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
             <span className="text-sm font-medium">Configuracion guardada exitosamente</span>
           </div>
         )}
