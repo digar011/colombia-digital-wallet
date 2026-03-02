@@ -247,9 +247,9 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-surface-dark">
+      <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-surface-dark" role="status" aria-label="Cargando panel principal">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-colombia-blue" />
+          <Loader2 className="w-8 h-8 animate-spin text-colombia-blue" aria-hidden="true" />
           <p className="text-sm text-text-secondary dark:text-text-secondary-dark">
             Cargando tu informacion...
           </p>
@@ -280,9 +280,10 @@ export default function DashboardPage() {
           </div>
           <button
             onClick={() => router.push('/profile')}
-            className="relative p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            className="relative p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+            aria-label={`Notificaciones${unreadCount > 0 ? ` (${unreadCount} sin leer)` : ''}`}
           >
-            <Bell size={20} className="text-white" />
+            <Bell size={20} className="text-white" aria-hidden="true" />
             {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 w-5 h-5 bg-colombia-red text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                 {unreadCount}
@@ -306,7 +307,8 @@ export default function DashboardPage() {
           <div className="grid grid-cols-3 gap-4">
             <button
               onClick={() => router.push('/documents')}
-              className="flex flex-col items-center gap-1 focus:outline-none"
+              className="flex flex-col items-center gap-1 focus:outline-none focus:ring-2 focus:ring-colombia-blue/30 rounded-lg"
+              aria-label={`${mockDocuments.length} Documentos`}
             >
               <div className="w-10 h-10 rounded-full bg-colombia-blue/10 flex items-center justify-center">
                 <FileText size={18} className="text-colombia-blue" />
@@ -320,7 +322,8 @@ export default function DashboardPage() {
             </button>
             <button
               onClick={() => router.push('/services')}
-              className="flex flex-col items-center gap-1 focus:outline-none"
+              className="flex flex-col items-center gap-1 focus:outline-none focus:ring-2 focus:ring-colombia-blue/30 rounded-lg"
+              aria-label={`${upcomingAppointments.length} Citas`}
             >
               <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center">
                 <Calendar size={18} className="text-amber-600" />
@@ -334,7 +337,8 @@ export default function DashboardPage() {
             </button>
             <button
               onClick={() => router.push('/profile')}
-              className="flex flex-col items-center gap-1 focus:outline-none"
+              className="flex flex-col items-center gap-1 focus:outline-none focus:ring-2 focus:ring-colombia-blue/30 rounded-lg"
+              aria-label={`${unreadCount} Alertas`}
             >
               <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center">
                 <Bell size={18} className="text-rose-600" />

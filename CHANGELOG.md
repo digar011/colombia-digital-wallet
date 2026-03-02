@@ -19,6 +19,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **CSRF token endpoint** (`src/app/api/csrf/route.ts`): GET `/api/csrf` issues tokens via double-submit cookie pattern, rate limited by `authLimiter` (10 req/min per IP).
 - **useCsrf hook** (`src/lib/hooks/useCsrf.ts`): Client-side hook that auto-fetches CSRF token on mount and provides `refreshToken` for on-demand refresh.
 
+### Fixed
+- **WCAG 2.1 AA accessibility audit**: Comprehensive accessibility improvements across all UI components and pages.
+  - `layout.tsx`: Allow user zoom (`userScalable: true`, `maximumScale: 5`) — fixes WCAG 1.4.4 Resize Text.
+  - `Button.tsx`: Add `aria-busy` when loading, `aria-hidden` on decorative icons.
+  - `Input.tsx`: Fix right icon keyboard access (`tabIndex={0}` + `onKeyDown`), `aria-hidden` on decorative left icon.
+  - `Modal.tsx`: Use `useId()` for unique `aria-labelledby`/`aria-describedby` IDs — prevents conflicts with multiple modals.
+  - `LoadingSpinner.tsx`: Add `role="status"` and `aria-label` for screen reader announcements.
+  - `EmptyState.tsx`: Add `aria-hidden` on decorative icon container.
+  - `AdminHeader.tsx`: Add `aria-label` on search input, `aria-expanded`/`aria-haspopup` on user menu, `aria-pressed` on role toggle, `role="menu"`/`role="menuitem"` on dropdown, `aria-hidden` on breadcrumb separators.
+  - `Dashboard page`: Add `role="status"` on loading state, `aria-label` on notification bell and stat buttons, visible focus rings on interactive cards.
+  - `Citizen layout`: Remove redundant `role="main"` (implicit on `<main>`).
+
 ## [0.4.0] - 2026-02-26
 
 ### Added
