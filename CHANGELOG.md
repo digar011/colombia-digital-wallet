@@ -4,6 +4,13 @@ All notable changes to the Colombia Digital Wallet (Mi Colombia Digital) project
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] - 2026-03-01
+
+### Added
+- **CSRF token endpoint** (`src/app/api/csrf/route.ts`): GET `/api/csrf` issues tokens via double-submit cookie pattern, rate limited by `authLimiter` (10 req/min per IP).
+- **useCsrf hook** (`src/lib/hooks/useCsrf.ts`): Client-side hook that auto-fetches CSRF token on mount and provides `refreshToken` for on-demand refresh.
+- **AdminRoleContext** (`src/lib/contexts/AdminRoleContext.tsx`): Missing context provider required by admin layout — fixes pre-existing build error.
+
 ## [Unreleased] - 2026-02-26
 
 ### Added
