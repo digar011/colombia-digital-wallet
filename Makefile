@@ -7,7 +7,7 @@
 .DEFAULT_GOAL := help
 
 # All targets are phony (not file-based)
-.PHONY: help dev build start clean install test test-coverage typecheck lint lint-fix ci e2e e2e-prod e2e-install e2e-ui e2e-headed
+.PHONY: help dev build start clean install test test-coverage typecheck lint lint-fix audit ci e2e e2e-prod e2e-install e2e-ui e2e-headed
 
 # -----------------------------------------------------------------------------
 # Help
@@ -52,6 +52,9 @@ clean: ## Remove build artifacts and caches
 lint: ## Run ESLint
 	npm run lint
 
+audit: ## Run npm security audit (high/critical)
+	npm audit --audit-level=high
+
 lint-fix: ## Run ESLint with auto-fix
 	npx next lint --fix
 
@@ -90,7 +93,7 @@ e2e-headed: ## Run Playwright tests with visible browser
 # Mirrors .github/workflows/ci.yml: lint -> build -> e2e
 # -----------------------------------------------------------------------------
 
-ci: lint typecheck build ## Full CI pipeline: lint, typecheck, build
+ci: lint typecheck audit build ## Full CI pipeline: lint, typecheck, audit, build
 	@echo ""
-	@echo "CI pipeline passed: lint, typecheck, build"
+	@echo "CI pipeline passed: lint, typecheck, audit, build"
 	@echo "Run 'make e2e' separately to include Playwright tests."

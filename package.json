@@ -14,6 +14,7 @@
     "test:e2e:ui": "npx playwright test --ui",
     "test:e2e:headed": "npx playwright test --headed",
     "test:e2e:prod": "npx playwright test --config=playwright.prod.config.ts",
+    "audit": "npm audit --audit-level=high",
     "format": "biome format --write .",
     "format:check": "biome check --formatter-enabled=true --linter-enabled=false ."
   },
