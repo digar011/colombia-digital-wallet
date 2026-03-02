@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased] - 2026-03-01
 
+### Added
+- **Zod validation wired into citizen and admin forms**: Profile edit form with `updateProfileSchema`, appointment booking form with `appointmentBookingSchema`, admin document issuance with `issueDocumentSchema`, admin user search with `searchCitizensSchema`, admin user status change with `updateCitizenStatusSchema`.
+- **Profile edit mode**: Inline editing for phone, email, address, city, and department with real-time Zod validation and Spanish error messages.
+- **Appointment booking form**: Service type selector, date/time pickers, and notes field with full validation replacing the placeholder alert.
+- **Admin document issuance validation**: Form-level validation on citizen ID and document type with inline error display.
+- **Admin user status change form**: Status selector and reason field with min-length validation for audit trail.
+- **AdminRoleContext**: Missing context file created (`src/lib/contexts/AdminRoleContext.tsx`) to fix pre-existing build error.
+- **Structured logging in middleware**: Route protection decisions (redirects, blocks, allows) now logged via `logger.info`/`logger.debug` with pathname and action metadata.
+- **Auth event logging**: `logAuthEvent()` wired into `useAuth` hook for login, register, logout, and failed login events with structured metadata.
+- **API response helpers** (`src/lib/utils/apiHelpers.ts`): Standardized `createApiResponse()`, `createErrorResponse()`, `ApiErrors` factory, and `withAuth()` wrapper for future API routes.
+- **CSRF token endpoint** (`src/app/api/csrf/route.ts`): GET `/api/csrf` issues tokens via double-submit cookie pattern, rate limited by `authLimiter` (10 req/min per IP).
+- **useCsrf hook** (`src/lib/hooks/useCsrf.ts`): Client-side hook that auto-fetches CSRF token on mount and provides `refreshToken` for on-demand refresh.
+
 ### Fixed
 - **WCAG 2.1 AA accessibility audit**: Comprehensive accessibility improvements across all UI components and pages.
   - `layout.tsx`: Allow user zoom (`userScalable: true`, `maximumScale: 5`) — fixes WCAG 1.4.4 Resize Text.
@@ -18,7 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - `Dashboard page`: Add `role="status"` on loading state, `aria-label` on notification bell and stat buttons, visible focus rings on interactive cards.
   - `Citizen layout`: Remove redundant `role="main"` (implicit on `<main>`).
 
-## [Unreleased] - 2026-02-26
+## [0.4.0] - 2026-02-26
 
 ### Added
 - Security headers in `next.config.mjs`: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-DNS-Prefetch-Control.
