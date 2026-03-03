@@ -2,7 +2,7 @@
 
 > **Document Purpose**: A complete record of every change, integration, and modification that has been completed or is planned for the Mi Colombia Digital platform, along with the rationale for each decision.
 >
-> **Last Updated**: February 26, 2026
+> **Last Updated**: March 2, 2026
 
 ---
 
@@ -15,16 +15,16 @@
    - [Phase 4 — Agency Portals & Localization](#phase-4--agency-portals--localization-february-23-2026)
    - [Phase 5 — Documentation Audit](#phase-5--documentation-audit-february-26-2026)
    - [Phase 6 — Security Headers](#phase-6--security-headers-february-26-2026)
+   - [Phase 7 — Validation, Logging, Security, A11y, Tests, PWA & Performance](#phase-7--validation-logging-security-a11y-tests-pwa--performance-march-1-2026)
+   - [Phase 8 — API Routes, React Query, Sentry & Offline Caching](#phase-8--api-routes-react-query-sentry--offline-caching-march-2-2026)
+   - [Phase 9 — Production Hardening P1](#phase-9--production-hardening-p1-march-2-2026)
+   - [Phase 10 — Production Hardening P2](#phase-10--production-hardening-p2-march-2-2026)
 2. [Planned Changes](#planned-changes)
-   - [Phase 7 — CI/CD Pipeline](#phase-7--cicd-pipeline-priority-critical)
-   - [Phase 8 — Real Authentication](#phase-8--real-authentication-priority-critical)
-   - [Phase 9 — API Routes](#phase-9--api-routes-priority-critical)
-   - [Phase 10 — Real Data Integration](#phase-10--real-data-integration-priority-critical)
-   - [Phase 11 — RLS & Access Control Verification](#phase-11--rls--access-control-verification-priority-high)
-   - [Phase 12 — PWA & Assets](#phase-12--pwa--assets-priority-high)
-   - [Phase 13 — Monitoring & Observability](#phase-13--monitoring--observability-priority-high)
-   - [Phase 14 — Quality & Accessibility](#phase-14--quality--accessibility-priority-medium)
-   - [Phase 15 — Rate Limiting & API Security](#phase-15--rate-limiting--api-security-priority-medium)
+   - [Phase 11 — Real Authentication](#phase-11--real-authentication-priority-critical)
+   - [Phase 12 — Real Data Integration](#phase-12--real-data-integration-priority-critical)
+   - [Phase 13 — Admin Role-Based Access Control](#phase-13--admin-role-based-access-control-priority-critical)
+   - [Phase 14 — RLS & Access Control Verification](#phase-14--rls--access-control-verification-priority-high)
+   - [Phase 15 — Redis Rate Limiting](#phase-15--redis-rate-limiting-priority-medium)
 3. [Phase Summary Table](#phase-summary-table)
 
 ---
@@ -309,177 +309,241 @@ Everything documented in this section is merged and present in the current codeb
 
 ---
 
-# Planned Changes
+## Phase 7 — Validation, Logging, Security, A11y, Tests, PWA & Performance (March 1, 2026)
 
-Everything documented in this section has NOT yet been implemented. Items are ordered by priority.
-
----
-
-## Phase 7 — CI/CD Pipeline (Priority: Critical)
+### 7.1 — Zod Validation on Forms (PR #2)
 
 | Change | Purpose |
 |--------|---------|
-| **GitHub Actions workflow** — Build + lint + Playwright tests on every pull request | Automated quality gates prevent broken code from reaching the main branch. Without CI, bugs introduced in one PR can silently break other features. For a government platform, deployment reliability is non-negotiable. |
-| **Deployment pipeline** — Automatic deployment to Vercel (or equivalent) from `main` branch | Manual deployments are error-prone and slow. Automated deployments ensure every merge to main is immediately available in production, with rollback capability. |
-| **Environment variable management** — Secrets stored in GitHub Actions / Vercel dashboard | Credentials must never be committed to the repository. CI/CD pipeline must securely inject Supabase URL, anon key, and service role key at build time. |
+| **Profile edit form** with `updateProfileSchema` | Inline editing for phone, email, address, city, department with real-time Zod validation and Spanish error messages. |
+| **Appointment booking form** with `appointmentBookingSchema` | Service type selector, date/time pickers, and notes field with full validation replacing the placeholder alert. |
+| **Admin document issuance** with `issueDocumentSchema` | Form-level validation on citizen ID and document type with inline error display. |
+| **Admin user status change** with `updateCitizenStatusSchema` | Status selector and reason field with min-length validation for audit trail. |
 
-**Files to create**:
-- `.github/workflows/ci.yml` — PR validation (build, lint, test)
-- `.github/workflows/deploy.yml` — Production deployment on main merge (optional, if not using Vercel's GitHub integration)
+### 7.2 — Structured Logging & API Helpers (PR #3)
 
-**Estimated effort**: 1 day
+| Change | Purpose |
+|--------|---------|
+| **Middleware logging** | Route protection decisions (redirects, blocks, allows) logged via `logger.info`/`logger.debug` with pathname and action metadata. |
+| **Auth event logging** | `logAuthEvent()` wired into `useAuth` for login, register, logout, and failed login events. |
+| **API response helpers** (`apiHelpers.ts`) | `createApiResponse()`, `createErrorResponse()`, `ApiErrors` factory, and `withAuth()` wrapper for standardized API responses. |
+
+### 7.3 — CSRF Protection (PR #4)
+
+| Change | Purpose |
+|--------|---------|
+| **CSRF token endpoint** (`/api/csrf`) | GET endpoint issues tokens via double-submit cookie pattern, rate limited by `authLimiter` (10 req/min). |
+| **`useCsrf` hook** | Client-side hook auto-fetches CSRF token on mount with `refreshToken` for on-demand refresh. |
+
+### 7.4 — WCAG 2.1 AA Accessibility Audit (PR #5)
+
+| Change | Purpose |
+|--------|---------|
+| `layout.tsx` zoom | `userScalable: true`, `maximumScale: 5` — fixes WCAG 1.4.4 Resize Text. |
+| `Button.tsx` | `aria-busy` when loading, `aria-hidden` on decorative icons. |
+| `Input.tsx` | Right icon keyboard access (`tabIndex={0}` + `onKeyDown`), `aria-hidden` on decorative left icon. |
+| `Modal.tsx` | `useId()` for unique `aria-labelledby`/`aria-describedby` IDs. |
+| `LoadingSpinner.tsx` | `role="status"` and `aria-label` for screen reader announcements. |
+| `EmptyState.tsx` | `aria-hidden` on decorative icon container. |
+| `AdminHeader.tsx` | `aria-label` on search, `aria-expanded`/`aria-haspopup` on menus, `role="menu"`/`role="menuitem"`. |
+| Dashboard page | `role="status"` on loading, `aria-label` on interactive elements, visible focus rings. |
+
+### 7.5 — E2E Test Expansion (PR #6)
+
+| Change | Purpose |
+|--------|---------|
+| **30 new E2E tests** across 3 files (136 total test cases, 408 across 3 browsers) | `auth-errors.spec.ts` (10 tests), `admin-settings.spec.ts` (8 tests), `empty-states.spec.ts` (12 tests). |
+
+### 7.6 — Production PWA Icons (PR #7)
+
+| Change | Purpose |
+|--------|---------|
+| **12 PNG icons** from SVG source via `sharp` | Standard PWA sizes (72–512px), Apple touch icon (180px), favicons (16/32px), maskable variant (512px with safe-area padding). |
+| **Icon generation script** (`scripts/generate-pwa-icons.mjs`) | Reproducible PNG generation from SVG source. |
+
+### 7.7 — Performance Optimization (PR #8)
+
+| Change | Purpose |
+|--------|---------|
+| **Dynamic import** `react-qr-code` via `next/dynamic` | QR code lazy-loaded only on document detail pages, reducing initial bundle. |
+| **Avatar optimization** | `<img>` → `next/image` in Header, AdminHeader, and AgencyHeader. |
+
+### 7.8 — Build Fix
+
+| Change | Purpose |
+|--------|---------|
+| **`AdminRoleContext.tsx`** created | Missing context file that caused pre-existing build error. |
 
 ---
 
-## Phase 8 — Real Authentication (Priority: Critical)
+## Phase 8 — API Routes, React Query, Sentry & Offline Caching (March 2, 2026)
+
+### 8.1 — API Routes with Mock Data (PR #11)
+
+| Change | Purpose |
+|--------|---------|
+| **21 API route handlers** | Auth (login, register, logout), citizen (profile, documents, vehicles, health, family, work, appointments, notifications), admin (citizens CRUD, documents, analytics, activity), and public verify — all using mock data with `{ success, data, meta }` response format. |
+| **Server-side Zod validation** | All mutation endpoints validate request bodies with existing Zod schemas, returning 422 with Spanish error details on failure. |
+| **CSRF protection** | `csrfProtect()` integrated into all POST/PUT routes, returning 403 on token mismatch. |
+| **Structured logging** | `logApiRequest()`, `logAuthEvent()`, `logDocumentAccess()` wired into every route with request timing. |
+| **Rate limiting** | `authLimiter` (10/min), `citizenApiLimiter` (100/min), `adminLimiter` (500/min), `verificationLimiter` (1000/min) with 429 responses and `Retry-After` headers. |
+
+### 8.2 — React Query Hooks (PR #12)
+
+| Change | Purpose |
+|--------|---------|
+| **12 hooks** with query key factories | `useCitizenProfile`, `useCitizenDocuments`, `useCitizenVehicles`, `useCitizenHealth`, `useCitizenFamily`, `useCitizenWork`, `useCitizenAppointments`, `useCitizenNotifications`, `useAdminCitizens`, `useAdminAnalytics`, `useAdminActivity`, `useVerifyDocument`. |
+| **Type-safe API client** | `fetchApi<T>()` utility with `ApiError` class for standardized error handling. |
+
+### 8.3 — Sentry Error Monitoring (PR #9)
+
+| Change | Purpose |
+|--------|---------|
+| **`@sentry/nextjs`** configured | Client, server, and edge runtimes with 10% production sampling, session replay, and source map uploads in CI. |
+| **Global error boundary** | `global-error.tsx` with Spanish UI that captures to Sentry and offers retry. |
+
+### 8.4 — Offline Caching (PR #10)
+
+| Change | Purpose |
+|--------|---------|
+| **Runtime caching strategies** in `next-pwa` | `NetworkFirst` for API/pages (24h), `CacheFirst` for images (30d) and fonts (1y), `StaleWhileRevalidate` for JS/CSS (7d). |
+| **Offline fallback page** | `/offline` route with Spanish UI shown when navigation fails without connectivity. |
+| **`useOfflineStatus` hook** | Tracks `navigator.onLine` with event listeners. |
+| **`OfflineBanner` component** | Amber warning banner at top of layout when offline. |
+
+---
+
+## Phase 9 — Production Hardening P1 (March 2, 2026)
+
+| Change | PR | Issue | Purpose |
+|--------|-----|-------|---------|
+| **robots.txt and sitemap.xml** | #37 | #20 | Generated via Next.js metadata API. Robots blocks `/admin/*`, `/agency/*`, `/api/*`; sitemap includes public pages with priority and changeFrequency. |
+| **Route-level error boundaries** | #38 | #21 | `error.tsx` in each route group (`(citizen)`, `(admin)`, `(agency)`, `(auth)`) with Spanish UI, Sentry capture, retry button, and navigation to safe page. |
+| **Remove hardcoded API key** | #34 | #22 | Removed fake API key `sk-ag-7f3a92bc-...` from agency settings, replaced with masked placeholder. |
+| **Aria-live regions** | #39 | #23 | `role="alert"` / `aria-live="assertive"` on auth errors, `role="status"` / `aria-live="polite"` on success confirmations, search counts, toasts, and loading states. |
+| **CSP hardened** | #42 | #24 | Removed `'unsafe-eval'` from `script-src` in Content Security Policy. `'unsafe-inline'` retained as Next.js App Router requires it for hydration. |
+| **Makefile** | #35 | #25 | Standardized `make` targets: `dev`, `build`, `clean`, `lint`, `typecheck`, `audit`, `ci`, `e2e`, `e2e-prod`, etc. |
+| **Biome formatter** | #41 | #26 | Biome v2.4.4 with project conventions (2-space indent, single quotes, 100-char lines). `npm run format` / `npm run format:check`. |
+| **223 unit tests** | #40 | #27 | Jest + ts-jest with 8 test suites covering `cn`, `csrf`, `logger`, `apiHelpers`, `rateLimit`, and all Zod schemas. 98%+ coverage. |
+| **Sentry DSN documentation** | #36 | #28 | Added `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` to `.env.example`, CLAUDE.md, and ONBOARDING docs. |
+
+---
+
+## Phase 10 — Production Hardening P2 (March 2, 2026)
+
+| Change | PR | Issue | Purpose |
+|--------|-----|-------|---------|
+| **Loading states for all routes** | #46 | #30 | `loading.tsx` with `LoadingSpinner` in every route group for automatic Next.js Suspense boundaries. |
+| **JSON-LD structured data** | #45 | #31 | Government organization schema on layout and login page for SEO rich results. |
+| **npm audit in CI** | #43 | #32 | `npm audit --audit-level=high` step in GitHub Actions after install (`continue-on-error: true`). `audit` Makefile target. CI branch triggers fixed from `main` to `master`. |
+| **Playwright production build testing** | #44 | #33 | `playwright.prod.config.ts` runs E2E tests against `next start` production server. CI updated to test against production build. `e2e-prod` Makefile target. |
+
+---
+
+# Planned Changes
+
+Everything documented in this section has NOT yet been implemented. All remaining items require external infrastructure (Supabase credentials, Redis) that is not yet provisioned.
+
+---
+
+## Phase 11 — Real Authentication (Priority: Critical)
+
+> **GitHub Issue**: [#15](https://github.com/digar011/colombia-digital-wallet/issues/15)
+> **Blocked by**: Supabase credentials
 
 | Change | Purpose |
 |--------|---------|
 | **Replace mock auth with Supabase Auth** | Production requires real identity verification. The current localStorage-based mock auth provides zero security — any user can set an `auth-token` cookie and access all routes. Supabase Auth provides JWT-based authentication with bcrypt password hashing, token refresh, and session management. |
 | **Update `AuthContext` and `useAuth` hook** | Must switch from `localStorage.setItem('user', ...)` to `supabase.auth.signInWithPassword()`, `supabase.auth.signUp()`, and `supabase.auth.signOut()`. The context must subscribe to `onAuthStateChange` for reactive session updates. |
 | **Update middleware to use Supabase JWT tokens** | Replace `cookies.get('auth-token')` check with Supabase server-side session validation using `@supabase/ssr`. The middleware must call `supabase.auth.getUser()` to verify the JWT on each request. |
-| **Email verification flow** | Citizens must verify email ownership before accessing government documents. Without email verification, anyone can register with a fake email and the account cannot be recovered. Supabase Auth provides built-in email confirmation with customizable templates. |
-| **Password reset flow** | Standard authentication requirement. Citizens who forget their password must be able to reset it via email. Supabase Auth provides `resetPasswordForEmail()` with a magic link flow. |
+| **Email verification flow** | Citizens must verify email ownership before accessing government documents. Supabase Auth provides built-in email confirmation with customizable templates. |
+| **Password reset flow** | Citizens who forget their password must be able to reset it via email. Supabase Auth provides `resetPasswordForEmail()` with a magic link flow. |
 
-**Files to modify**:
-- `src/lib/contexts/AuthContext.tsx`
-- `src/lib/hooks/useAuth.ts`
-- `src/middleware.ts`
-- `src/app/(auth)/login/page.tsx`
-- `src/app/(auth)/register/page.tsx`
-- `src/app/(auth)/verify/page.tsx`
+**Files to modify**: `AuthContext.tsx`, `useAuth.ts`, `middleware.ts`, `login/page.tsx`, `register/page.tsx`, `verify/page.tsx`
 
 **Estimated effort**: 2-3 days
 
 ---
 
-## Phase 9 — API Routes (Priority: Critical)
+## Phase 12 — Real Data Integration (Priority: Critical)
+
+> **GitHub Issues**: [#16](https://github.com/digar011/colombia-digital-wallet/issues/16), [#17](https://github.com/digar011/colombia-digital-wallet/issues/17)
+> **Blocked by**: Phase 11 (real auth), Supabase credentials
 
 | Change | Purpose |
 |--------|---------|
-| **Implement Next.js API routes** for all endpoints documented in `docs/en/API_REFERENCE.md` | Client-side-only data access is insecure for production. API routes provide a server-side layer where authentication tokens are validated, input is sanitized, and database queries are executed with proper authorization. Without API routes, a malicious user could modify client-side JavaScript to query any data. |
+| **Connect API routes to Supabase database** | The 21 API routes (Phase 8) currently return mock data. They must be updated to query the real Supabase database using the server client with proper RLS enforcement. |
+| **Wire pages to React Query hooks** | The 12 React Query hooks (Phase 8) are ready but pages still import mock data directly. Each page must switch to using the hooks, with mock data retained as a fallback behind `NEXT_PUBLIC_ENABLE_MOCK_DATA`. |
+| **Seed database with test data** | Development and QA testing require realistic data volumes across citizens, documents, vehicles, health records, and appointments. |
 
-**Endpoints to implement**:
-
-| Route Group | Endpoints | Purpose |
-|-------------|-----------|---------|
-| `/api/auth/*` | `login`, `register`, `logout`, `refresh` | Server-side auth operations with proper cookie handling |
-| `/api/citizens/*` | `me` (GET, PATCH) | Authenticated citizen profile access |
-| `/api/documents/*` | list (GET), detail (GET), QR generation (GET) | Document data with citizen ownership validation |
-| `/api/vehicles/*` | list (GET), detail (GET) | Vehicle records scoped to authenticated citizen |
-| `/api/health/*` | records (GET), vaccinations (GET) | Health data scoped to authenticated citizen |
-| `/api/services/*` | programs (GET), appointments (GET, POST) | Social program data and appointment creation |
-| `/api/verify` | POST (public, no auth required) | QR code verification endpoint for government officials |
-| `/api/admin/*` | `citizens` (GET), `citizens/:id` (GET), `documents/issue` (POST), `analytics` (GET), `verification-logs` (GET) | Admin endpoints with role-based access control |
-
-**Note**: The directory structure for API routes already exists (`src/app/api/auth/`, `src/app/api/citizens/`, etc.) but the directories are empty — no `route.ts` files have been created.
-
-**Estimated effort**: 3-5 days
-
----
-
-## Phase 10 — Real Data Integration (Priority: Critical)
-
-| Change | Purpose |
-|--------|---------|
-| **Connect all citizen pages to Supabase queries** | Replace mock data imports with real database reads. Each page currently imports from `src/lib/mock/citizenData.ts` — these must be replaced with TanStack React Query hooks that call the API routes (Phase 9) or Supabase client directly. |
-| **Connect admin pages to Supabase queries** | Replace `src/lib/mock/adminData.ts` imports with real admin data queries. |
-| **Connect agency pages to Supabase queries** | Replace `src/lib/mock/agencyData.ts` imports with real agency data queries. |
-| **Seed database with test data** | Development and QA testing require realistic data volumes. Seed scripts should create multiple citizen profiles with varying document sets, verification states, and geographic distribution. |
-| **Implement TanStack React Query hooks** | Create custom hooks (e.g., `useDocuments()`, `useVehicles()`, `useHealthRecords()`) that handle loading states, error states, caching, and background refetching. The `QueryProvider` is already configured. |
-
-**Files to modify**: Every page file under `src/app/(citizen)/`, `src/app/(admin)/`, and `src/app/(agency)/`.
+**Files to modify**: All 21 `route.ts` files in `src/app/api/`, all page files under `(citizen)`, `(admin)`, `(agency)`.
 
 **Estimated effort**: 5-7 days
 
 ---
 
-## Phase 11 — RLS & Access Control Verification (Priority: High)
+## Phase 13 — Admin Role-Based Access Control (Priority: Critical)
+
+> **GitHub Issue**: [#18](https://github.com/digar011/colombia-digital-wallet/issues/18)
+> **Blocked by**: Phase 11 (real auth)
 
 | Change | Purpose |
 |--------|---------|
-| **End-to-end RLS testing with real auth tokens** | RLS policies have been defined in SQL but never tested with real Supabase Auth tokens. Policies using `auth.uid()` must be validated: a citizen with UUID `A` must NOT be able to read records belonging to citizen UUID `B`. Testing must cover all 12 tables. |
-| **Admin role enforcement** | Admin API endpoints must check the JWT's role claim before executing queries. A citizen token must be rejected by admin endpoints. The `admin_users` table defines roles (super_admin, admin, operator, viewer) — each role must be tested for correct access levels. |
-| **Cross-portal isolation** | Verify that agency tokens cannot access citizen data and citizen tokens cannot access agency data. The separate auth flows (citizen vs. agency) must be validated at the database level, not just at the middleware level. |
+| **JWT role claims** | Admin API endpoints must check the JWT's role claim before executing queries. A citizen token must be rejected by admin endpoints. |
+| **Role hierarchy enforcement** | The `admin_users` table defines roles (super_admin, admin, operator, viewer) — each role must have correct access levels enforced at both middleware and API route level. |
+
+**Estimated effort**: 1-2 days
+
+---
+
+## Phase 14 — RLS & Access Control Verification (Priority: High)
+
+> **Blocked by**: Phase 11, Phase 12, Phase 13
+
+| Change | Purpose |
+|--------|---------|
+| **End-to-end RLS testing with real auth tokens** | RLS policies have been defined in SQL but never tested with real Supabase Auth tokens. Policies using `auth.uid()` must be validated: citizen A must NOT see citizen B's data. Testing must cover all 12 tables. |
+| **Cross-portal isolation** | Verify that agency tokens cannot access citizen data and citizen tokens cannot access agency data at the database level, not just middleware. |
 
 **Estimated effort**: 2-3 days
 
 ---
 
-## Phase 12 — PWA & Assets (Priority: High)
+## Phase 15 — Redis Rate Limiting (Priority: Medium)
+
+> **GitHub Issue**: [#29](https://github.com/digar011/colombia-digital-wallet/issues/29)
+> **Blocked by**: Redis/KV infrastructure
 
 | Change | Purpose |
 |--------|---------|
-| **Generate PWA icons** (192x192, 512x512 minimum; plus Apple touch icons at 120, 152, 167, 180) | The `manifest.json` references `/icons/icon-192.png` and `/icons/icon-512.png` but the `/public/icons/` directory is empty. Without these icons, "Add to Home Screen" shows a generic browser icon and some devices will reject the PWA installation. |
-| **Add country flag assets** to `public/flags/` | The `CountrySwitcher` component references flag images for Colombia, Ecuador, and Guatemala. The `/public/flags/` directory is empty. Without flags, the country switcher shows broken images. |
-| **Implement service worker** for offline caching | Citizens need access to core documents (Cedula, health card) without internet connectivity. Colombia has significant rural areas with poor connectivity. The service worker should cache the most recent document data, QR codes, and the app shell. `next-pwa` is already installed as a dependency. |
-| **Configure `next-pwa`** in `next.config.mjs` | The `next-pwa` package is in `package.json` but is not configured in `next.config.mjs`. It needs to wrap the Next.js config to generate the service worker at build time. |
+| **Replace in-memory rate limiter with Redis** | The current in-memory sliding-window rate limiter (`src/lib/middleware/rateLimit.ts`) resets on server restart and does not work across multiple instances. A Redis-backed solution (e.g., `@upstash/ratelimit`) provides persistent, distributed rate limiting. |
 
-**Estimated effort**: 2-3 days
-
----
-
-## Phase 13 — Monitoring & Observability (Priority: High)
-
-| Change | Purpose |
-|--------|---------|
-| **Error monitoring** (Sentry or equivalent) | Track and alert on production errors in real time. A government platform serving citizens cannot afford silent failures — if the Cedula page crashes for 10% of users, the team must know immediately. Sentry provides stack traces, breadcrumbs, and user impact analysis. |
-| **Server-side logging** (structured JSON logs) | Audit trail for document access and admin actions. Government compliance may require logging who accessed which citizen's data, when, and from where. Structured logs enable integration with centralized log management (CloudWatch, Datadog, etc.). |
-| **Analytics and metrics** | Track platform adoption (registrations per day), usage patterns (most-viewed documents), performance (API latency p95/p99), and errors (rate by endpoint). Essential for demonstrating platform value to government stakeholders and identifying optimization priorities. |
-
-**Estimated effort**: 2-3 days
-
----
-
-## Phase 14 — Quality & Accessibility (Priority: Medium)
-
-| Change | Purpose |
-|--------|---------|
-| **Accessibility audit (WCAG 2.1 AA compliance)** | Government platforms must be accessible to citizens with disabilities. This is a legal requirement in many jurisdictions and an ethical obligation for any public service. Audit must cover: screen reader compatibility, keyboard navigation, color contrast ratios, focus indicators, ARIA labels, and form accessibility. |
-| **Performance optimization** (Lighthouse targets) | Citizens access the platform on low-end Android devices and slow 3G/4G connections. Performance targets from `ARCHITECTURE.md`: FCP < 1.5s, LCP < 2.5s, TTI < 3s, CLS < 0.1. Optimization may include: code splitting, image optimization, font subsetting, and server component usage. |
-| **Expand E2E test coverage** | Current tests cover happy paths across 9 test files. Production requires: error state testing (network failures, invalid inputs), edge cases (expired documents, suspended accounts), mobile-specific interactions (swipe, pinch-to-zoom on QR), and cross-browser validation. |
-| **Load testing** | Government platforms face sudden traffic spikes during events such as election days, social program payment dates, or policy announcements. Load testing with tools like k6 or Artillery must validate the platform handles at least 10,000 concurrent users without degradation. |
-
-**Estimated effort**: 5-7 days
-
----
-
-## Phase 15 — Rate Limiting & API Security (Priority: Medium)
-
-| Change | Purpose |
-|--------|---------|
-| **Rate limiting on auth endpoints** (`/api/auth/login`, `/api/auth/register`) | Prevent brute-force password attacks on citizen accounts. Without rate limiting, an attacker can attempt thousands of password combinations per second. Target: 5 attempts per minute per IP for login, 3 registrations per hour per IP. |
-| **Rate limiting on verification endpoint** (`/api/verify`) | The QR verification endpoint is public (no auth required) because government officials scan QR codes without citizen credentials. Without rate limiting, it can be abused for enumeration attacks (scanning sequential document numbers to discover valid ones). Target: 1,000 requests per minute per IP. |
-| **Input validation with Zod schemas** | Validate all request bodies at the API boundary using Zod schemas. Prevents injection attacks (SQL injection, NoSQL injection), ensures data integrity (valid email format, non-negative values, correct document number format), and provides clear error messages for malformed requests. |
-| **CSRF protection** | Prevent cross-site request forgery on state-changing operations (document issuance, profile updates, appointment booking). CSRF tokens must be validated on all POST/PATCH/DELETE endpoints. |
-| **API key management for agency integrations** | When external agency systems (RNEC, RUNT, etc.) integrate directly via API, each agency needs a unique API key with usage tracking, rate limits, and revocation capability. This is required before any government agency API integration goes live. |
-
-**Estimated effort**: 3-4 days
+**Estimated effort**: 1 day
 
 ---
 
 # Phase Summary Table
 
-| Phase | Status | Priority | Description | Estimated Effort |
-|-------|--------|----------|-------------|-----------------|
-| 1 | Completed | -- | Project scaffolding (Next.js 14 + TS + Tailwind) | -- |
-| 2 | Completed | -- | Full platform build (citizen, admin, auth, components, DB, tests, docs) | -- |
-| 3 | Completed | -- | Stability fix (env var handling, test fix) | -- |
-| 4 | Completed | -- | Agency portals, Spanish admin translations, PWA manifest | -- |
-| 5 | Completed | -- | Documentation audit (8 docs updated) | -- |
-| 6 | Completed | -- | Security headers (CSP, HSTS, X-Frame-Options, etc.) | -- |
-| 7 | **Planned** | Critical | CI/CD pipeline (GitHub Actions + deployment) | 1 day |
-| 8 | **Planned** | Critical | Real authentication (Supabase Auth, email verification, password reset) | 2-3 days |
-| 9 | **Planned** | Critical | API routes (auth, citizens, documents, vehicles, health, services, verify, admin) | 3-5 days |
-| 10 | **Planned** | Critical | Real data integration (replace mock data, TanStack Query hooks, seed data) | 5-7 days |
-| 11 | **Planned** | High | RLS & access control verification (end-to-end testing) | 2-3 days |
-| 12 | **Planned** | High | PWA & assets (icons, flags, service worker, next-pwa config) | 2-3 days |
-| 13 | **Planned** | High | Monitoring & observability (Sentry, logging, analytics) | 2-3 days |
-| 14 | **Planned** | Medium | Quality & accessibility (WCAG audit, performance, test coverage, load testing) | 5-7 days |
-| 15 | **Planned** | Medium | Rate limiting & API security (auth rate limits, Zod validation, CSRF, API keys) | 3-4 days |
+| Phase | Status | Priority | Description |
+|-------|--------|----------|-------------|
+| 1 | Completed | -- | Project scaffolding (Next.js 14 + TS + Tailwind) |
+| 2 | Completed | -- | Full platform build (citizen, admin, auth, components, DB, tests, docs) |
+| 3 | Completed | -- | Stability fix (env var handling, test fix) |
+| 4 | Completed | -- | Agency portals, Spanish admin translations, PWA manifest |
+| 5 | Completed | -- | Documentation audit (8 docs updated) |
+| 6 | Completed | -- | Security headers (CSP, HSTS, X-Frame-Options, etc.) |
+| 7 | Completed | -- | Zod validation, logging, CSRF, WCAG audit, E2E tests, PWA icons, performance |
+| 8 | Completed | -- | 21 API routes, React Query hooks, Sentry monitoring, offline caching |
+| 9 | Completed | -- | P1 hardening: SEO, error boundaries, CSP, Makefile, Biome, 223 unit tests |
+| 10 | Completed | -- | P2 hardening: loading states, JSON-LD, npm audit CI, Playwright prod build |
+| 11 | **Planned** | Critical | Real authentication (Supabase Auth) — requires Supabase credentials |
+| 12 | **Planned** | Critical | Real data integration (connect API routes + pages to Supabase) |
+| 13 | **Planned** | Critical | Admin role-based access control — requires real auth |
+| 14 | **Planned** | High | RLS & access control verification — requires real auth + data |
+| 15 | **Planned** | Medium | Redis rate limiting — requires Redis/KV infrastructure |
 
-**Total estimated effort for planned phases**: 23-36 days
+**Remaining effort for planned phases**: 11-16 days (all blocked on Supabase credentials or Redis infrastructure)
 
 ---
 
-> **Note**: This roadmap reflects the state of the codebase as of February 26, 2026. Phase priorities and estimates should be reviewed and updated as the project progresses.
+> **Note**: This roadmap reflects the state of the codebase as of March 2, 2026. Phases 1-10 are complete. Phases 11-14 are blocked on Supabase credentials. Phase 15 is blocked on Redis/KV infrastructure.

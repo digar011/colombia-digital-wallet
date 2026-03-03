@@ -65,13 +65,11 @@ typecheck: ## Run TypeScript type checking (no emit)
 # Testing
 # -----------------------------------------------------------------------------
 
-test: ## Run unit tests (placeholder -- Jest not yet configured)
-	@echo "Unit tests are not yet configured. Set up Jest to enable this target."
-	@echo "Run 'make e2e' for Playwright end-to-end tests."
+test: ## Run unit tests (Jest)
+	npm run test
 
-test-coverage: ## Run unit tests with coverage report (placeholder)
-	@echo "Unit tests with coverage are not yet configured."
-	@echo "Set up Jest with --coverage to enable this target."
+test-coverage: ## Run unit tests with coverage report (Jest)
+	npm run test:coverage
 
 e2e: ## Run Playwright E2E tests (all browser projects)
 	npm run test:e2e
@@ -90,7 +88,7 @@ e2e-headed: ## Run Playwright tests with visible browser
 
 # -----------------------------------------------------------------------------
 # CI Pipeline
-# Mirrors .github/workflows/ci.yml: lint -> build -> e2e
+# Mirrors .github/workflows/ci.yml: lint -> typecheck -> audit -> build -> e2e-prod
 # -----------------------------------------------------------------------------
 
 ci: lint typecheck audit build ## Full CI pipeline: lint, typecheck, audit, build

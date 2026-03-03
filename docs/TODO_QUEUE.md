@@ -2,7 +2,7 @@
 
 > **Purpose**: Ordered backlog of remaining work items for production readiness. Each item includes priority, dependencies, and estimated effort. See `PRODUCTION_ROADMAP.md` for full rationale behind each change.
 >
-> **Last Updated**: February 26, 2026
+> **Last Updated**: March 2, 2026
 
 ---
 
@@ -11,24 +11,21 @@
 | Priority | Meaning |
 |----------|---------|
 | P0 | **Blocker** — Cannot launch without this |
-| P1 | **Critical** — Must have for production |
-| P2 | **High** — Should have before public launch |
-| P3 | **Medium** — Important but can follow shortly after launch |
+| P2 | **Medium** — Important but can follow shortly after launch |
 
 | Status | Meaning |
 |--------|---------|
 | `TODO` | Not started |
-| `IN PROGRESS` | Currently being worked on |
 | `BLOCKED` | Waiting on a dependency |
 | `DONE` | Completed |
 
 ---
 
-## P0 — Blockers (Cannot launch without)
+## P0 — Blockers (Require Supabase credentials)
 
 ### 1. Replace mock auth with Supabase Auth
-- **Status**: `TODO`
-- **Dependencies**: None (Supabase project already exists)
+- **Status**: `BLOCKED` (requires Supabase credentials)
+- **GitHub Issue**: [#15](https://github.com/digar011/colombia-digital-wallet/issues/15)
 - **Effort**: 2-3 days
 - **Files to modify**:
   - `src/lib/hooks/useAuth.ts` — Replace localStorage with Supabase `signInWithPassword`, `signUp`, `signOut`
@@ -37,242 +34,138 @@
   - `src/app/(auth)/login/page.tsx` — Wire form to real Supabase auth
   - `src/app/(auth)/register/page.tsx` — Wire form to real Supabase auth
   - `src/app/(auth)/verify/page.tsx` — Use Supabase email verification
-- **What to do**:
-  1. Update `useAuth` hook to call Supabase Auth methods instead of localStorage
-  2. Update `AuthContext` to subscribe to `onAuthStateChange` for session state
-  3. Update middleware to use `@supabase/ssr` `createServerClient` for JWT validation
-  4. Add password reset flow (new page at `/reset-password`)
-  5. Add email verification handling in `/verify` page
-  6. Remove hardcoded demo accounts from production builds (keep behind env flag)
 
-### 2. Implement API routes
-- **Status**: `TODO`
-- **Dependencies**: #1 (auth must work first for JWT validation)
+### 2. Connect API routes to Supabase database
+- **Status**: `BLOCKED` (waiting on #1)
+- **GitHub Issue**: [#16](https://github.com/digar011/colombia-digital-wallet/issues/16)
 - **Effort**: 3-5 days
-- **Files to create** (in `src/app/api/`):
-  - `auth/login/route.ts`
-  - `auth/register/route.ts`
-  - `auth/logout/route.ts`
-  - `auth/refresh/route.ts`
-  - `citizens/me/route.ts`
-  - `documents/route.ts`
-  - `documents/[id]/route.ts`
-  - `documents/[id]/qr/route.ts`
-  - `vehicles/route.ts`
-  - `health/route.ts`
-  - `health/vaccinations/route.ts`
-  - `services/route.ts`
-  - `appointments/route.ts`
-  - `verify/route.ts` (public)
-  - `admin/citizens/route.ts`
-  - `admin/citizens/[id]/route.ts`
-  - `admin/documents/issue/route.ts`
-  - `admin/analytics/route.ts`
-  - `admin/verification-logs/route.ts`
 - **What to do**:
-  1. Each route creates a Supabase server client and validates the JWT
+  1. Update all 21 API routes to query real Supabase database instead of returning mock data
   2. Citizen routes filter by `auth.uid()` (RLS handles this)
   3. Admin routes check role claim in JWT
-  4. Verification endpoint is public (no auth required)
-  5. Follow the contracts in `docs/en/API_REFERENCE.md`
+  4. Verification endpoint remains public (no auth required)
+  5. Seed the database with test data for QA
 
-### 3. Connect pages to real data
-- **Status**: `TODO`
-- **Dependencies**: #1, #2
-- **Effort**: 3-4 days
+### 3. Wire pages to React Query hooks
+- **Status**: `BLOCKED` (waiting on #1, #2)
+- **GitHub Issue**: [#17](https://github.com/digar011/colombia-digital-wallet/issues/17)
+- **Effort**: 2-3 days
 - **What to do**:
-  1. Create TanStack React Query hooks for each data domain (useDocuments, useVehicles, useHealth, etc.)
-  2. Each hook calls the API routes or direct Supabase client
-  3. Keep mock data as fallback when `NEXT_PUBLIC_ENABLE_MOCK_DATA=true`
-  4. Update each page to use the new hooks instead of importing mock data directly
-  5. Handle loading states, error states, and empty states
-  6. Seed the database with test data for QA
+  1. Update each citizen/admin/agency page to use React Query hooks instead of importing mock data directly
+  2. Keep mock data as fallback when `NEXT_PUBLIC_ENABLE_MOCK_DATA=true`
+  3. Loading states already exist (PR #46) — verify integration
 
----
-
-## P1 — Critical (Must have for production)
-
-### 4. End-to-end RLS verification
+### 4. Add admin role-based access control
 - **Status**: `BLOCKED` (waiting on #1)
-- **Dependencies**: #1, #3
+- **GitHub Issue**: [#18](https://github.com/digar011/colombia-digital-wallet/issues/18)
 - **Effort**: 1-2 days
 - **What to do**:
-  1. Create test script that authenticates as different users and verifies data isolation
-  2. Test citizen A cannot see citizen B's documents
-  3. Test admin role can read all citizens
-  4. Test agency staff access is properly scoped
-  5. Verify the 2 SQL migrations work correctly with real Supabase auth tokens
+  1. Admin API endpoints check JWT role claims before executing queries
+  2. Citizen tokens rejected by admin endpoints
+  3. Role hierarchy: super_admin, admin, operator, viewer
 
-### 5. Input validation with Zod
+### 5. Fix npm audit vulnerabilities
 - **Status**: `TODO`
-- **Dependencies**: None
-- **Effort**: 1-2 days
-- **Files to create/modify**:
-  - `src/lib/validations/auth.ts` — Login, register, password reset schemas
-  - `src/lib/validations/citizen.ts` — Profile update, document request schemas
-  - `src/lib/validations/admin.ts` — User management, document issuance schemas
-  - Update all form pages to validate with Zod before submission
+- **GitHub Issue**: [#19](https://github.com/digar011/colombia-digital-wallet/issues/19)
+- **Effort**: 0.5-1 day
 - **What to do**:
-  1. Install `zod` package
-  2. Define schemas for all form inputs
-  3. Add server-side validation in API routes
-  4. Add client-side validation in form components
-  5. Display validation errors in Spanish for citizen-facing forms
-
-### 6. CSRF protection
-- **Status**: `TODO`
-- **Dependencies**: #2 (needs API routes)
-- **Effort**: 0.5 day
-- **What to do**:
-  1. Implement CSRF token generation and validation for state-changing API routes
-  2. Add CSRF token to forms via hidden input or header
-
-### 7. Error monitoring (Sentry)
-- **Status**: `TODO`
-- **Dependencies**: None
-- **Effort**: 0.5 day
-- **What to do**:
-  1. Install `@sentry/nextjs`
-  2. Create `sentry.client.config.ts` and `sentry.server.config.ts`
-  3. Add Sentry DSN to environment variables
-  4. Wrap root layout with Sentry error boundary
-  5. Add source maps upload to CI build
-
-### 8. Server-side logging
-- **Status**: `TODO`
-- **Dependencies**: #2 (needs API routes to log)
-- **Effort**: 1 day
-- **What to do**:
-  1. Create logger utility (`src/lib/utils/logger.ts`)
-  2. Log all API route requests (method, path, user ID, status, duration)
-  3. Log authentication events (login, register, logout, failed attempts)
-  4. Log document access and verification events (government audit trail)
+  1. Run `npm audit --audit-level=high` and fix reported vulnerabilities
+  2. Update affected packages or apply overrides where needed
 
 ---
 
-## P2 — High (Should have before public launch)
+## P2 — Medium
 
-### 9. PWA icons and assets
-- **Status**: `TODO`
-- **Dependencies**: None
-- **Effort**: 0.5 day
+### 6. Replace in-memory rate limiter with Redis
+- **Status**: `BLOCKED` (requires Redis/KV infrastructure)
+- **GitHub Issue**: [#29](https://github.com/digar011/colombia-digital-wallet/issues/29)
+- **Effort**: 1 day
 - **What to do**:
-  1. Generate PWA icon set from Colombia coat of arms or app logo (192x192, 512x512, maskable, etc.)
-  2. Add icons to `public/icons/`
-  3. Add country flag PNGs to `public/flags/` (CO, EC, GT)
-  4. Update `manifest.json` with correct icon references
-  5. Add Apple touch icons and splash screens
-
-### 10. Service worker / offline support
-- **Status**: `TODO`
-- **Dependencies**: #3 (needs real data to cache)
-- **Effort**: 1-2 days
-- **What to do**:
-  1. Configure `next-pwa` in `next.config.mjs` (package already installed)
-  2. Define precache strategy for core document pages
-  3. Cache citizen's primary documents locally for offline viewing
-  4. Show offline indicator banner when connection is lost
-  5. Queue verification requests when offline, sync when back online
-
-### 11. Expand E2E test coverage
-- **Status**: `TODO`
-- **Dependencies**: None (can test against mock data)
-- **Effort**: 2-3 days
-- **What to do**:
-  1. Add tests for admin user management flow
-  2. Add tests for admin document issuance
-  3. Add tests for admin analytics views
-  4. Add mobile-specific interaction tests
-  5. Add error state and empty state tests
-  6. Add accessibility tests (axe integration with Playwright)
-
-### 12. Accessibility audit (WCAG 2.1 AA)
-- **Status**: `TODO`
-- **Dependencies**: None
-- **Effort**: 2-3 days
-- **What to do**:
-  1. Run Lighthouse accessibility audit on all pages
-  2. Add proper ARIA labels to all interactive elements
-  3. Ensure keyboard navigation works across all flows
-  4. Verify color contrast ratios meet AA standards
-  5. Add skip-to-content links
-  6. Test with screen reader (NVDA/VoiceOver)
+  1. Replace `src/lib/middleware/rateLimit.ts` in-memory store with Redis-backed solution
+  2. Use `@upstash/ratelimit` or similar for distributed rate limiting
+  3. Maintain the 4 existing rate limit tiers (auth, citizen, admin, verification)
 
 ---
 
-## P3 — Medium (Can follow shortly after launch)
+## Backlog (Require running infrastructure)
 
-### 13. Rate limiting
-- **Status**: `TODO`
-- **Dependencies**: #2 (needs API routes)
-- **Effort**: 1 day
-- **What to do**:
-  1. Install rate limiting package (e.g., `@upstash/ratelimit` or custom in-memory)
-  2. Apply strict limits on auth endpoints (10 attempts/minute per IP)
-  3. Apply moderate limits on citizen API (100 req/min)
-  4. Apply higher limits on verification endpoint (1000 req/min)
-  5. Return 429 with `Retry-After` header
-
-### 14. Performance optimization
-- **Status**: `TODO`
-- **Dependencies**: #3 (needs real data for meaningful metrics)
-- **Effort**: 1-2 days
-- **What to do**:
-  1. Run Lighthouse performance audit
-  2. Optimize images (next/image, WebP conversion)
-  3. Analyze and reduce JavaScript bundle size
-  4. Add loading skeletons to replace loading spinners
-  5. Verify targets in ARCHITECTURE.md (FCP < 1.5s, LCP < 2.5s, TTI < 3s)
-
-### 15. Load testing
-- **Status**: `BLOCKED` (waiting on #2, #3)
-- **Dependencies**: #2, #3
-- **Effort**: 1 day
-- **What to do**:
-  1. Set up k6 or Artillery load test scripts
-  2. Test auth endpoints under concurrent load
-  3. Test verification endpoint (expected high traffic from officials)
-  4. Test database query performance with realistic data volume
-  5. Identify and fix bottlenecks
-
-### 16. API key management for agency integrations
-- **Status**: `TODO`
-- **Dependencies**: #2
-- **Effort**: 2 days
-- **What to do**:
-  1. Design API key schema (key, agency_id, rate_limit, permissions, created_at, expires_at)
-  2. Create admin UI for generating/revoking API keys
-  3. Add API key validation middleware for external agency requests
-  4. Add usage tracking and analytics per key
+- End-to-end RLS verification with real Supabase Auth tokens — requires Supabase + real auth
+- Load testing with k6 or Artillery (10,000 concurrent) — requires running infrastructure
+- API key management for external agency integrations — requires real API keys
 
 ---
 
 ## Quick Reference — Dependency Chain
 
 ```
-#1 Real Auth ──────┬──→ #2 API Routes ──┬──→ #3 Real Data ──┬──→ #4 RLS Verification
-                   │                    │                    ├──→ #10 Service Worker
-                   │                    ├──→ #6 CSRF         ├──→ #14 Performance
-                   │                    ├──→ #8 Logging      └──→ #15 Load Testing
-                   │                    ├──→ #13 Rate Limit
-                   │                    └──→ #16 API Keys
-                   │
-Independent:       #5 Zod Validation
-                   #7 Sentry
-                   #9 PWA Assets
-                   #11 E2E Tests
-                   #12 Accessibility
+#1 Real Auth ──────┬──→ #2 API → Supabase ──→ #3 Wire Pages to Hooks
+                   ├──→ #4 Admin RBAC
+                   └──→ RLS Verification (backlog)
+
+Independent:       #5 npm audit
+                   #6 Redis rate limiter (infra-dependent)
 ```
 
 ---
 
-## Completed Today (Feb 26, 2026)
+## Completed
 
+### Production Hardening: P2 Items (March 2, 2026)
+| Item | PR | Issue | Status |
+|------|-----|-------|--------|
+| Add loading.tsx and Suspense boundaries for all routes | #46 | #30 | DONE |
+| Add structured data (JSON-LD) for public pages | #45 | #31 | DONE |
+| Add npm audit to CI pipeline | #43 | #32 | DONE |
+| Configure Playwright for production build | #44 | #33 | DONE |
+
+### Production Hardening: P1 Items (March 2, 2026)
+| Item | PR | Issue | Status |
+|------|-----|-------|--------|
+| Add robots.txt and sitemap.xml via Next.js metadata API | #37 | #20 | DONE |
+| Add route-level error.tsx boundaries | #38 | #21 | DONE |
+| Remove hardcoded mock API key from agency settings | #34 | #22 | DONE |
+| Add aria-live regions for dynamic content | #39 | #23 | DONE |
+| Harden CSP: remove unsafe-eval from script-src | #42 | #24 | DONE |
+| Add Makefile with standardized commands | #35 | #25 | DONE |
+| Configure Biome code formatter (v2.4.4) | #41 | #26 | DONE |
+| Add 223 unit tests with Jest (98%+ coverage) | #40 | #27 | DONE |
+| Document Sentry DSN setup | #36 | #28 | DONE |
+
+### API Routes, React Query, Sentry, Offline Caching (March 2, 2026)
+| Item | PR | Status |
+|------|-----|--------|
+| 21 API routes with mock data (auth, citizen, admin, verify) | #11 | DONE |
+| Zod validation on all API routes (server-side) | #11 | DONE |
+| CSRF protection on all state-changing routes | #11 | DONE |
+| Structured logging in all API routes | #11 | DONE |
+| Rate limiting on all API routes (4 tiers) | #11 | DONE |
+| React Query hooks for all 17 API endpoints | #12 | DONE |
+| Type-safe API client (fetchApi) | #12 | DONE |
+| Sentry error monitoring (client, server, edge) | #9 | DONE |
+| Global error boundary with Spanish UI | #9 | DONE |
+| Runtime caching strategies (next-pwa) | #10 | DONE |
+| Offline fallback page (/offline) | #10 | DONE |
+| useOfflineStatus hook + OfflineBanner | #10 | DONE |
+
+### Validation, Logging, Security, A11y, Tests, PWA, Performance (March 1, 2026)
+| Item | PR | Status |
+|------|-----|--------|
+| Zod validation on citizen and admin forms | #2 | DONE |
+| Structured logging in middleware and auth hook | #3 | DONE |
+| API response helpers (apiHelpers.ts) | #3 | DONE |
+| CSRF token endpoint + useCsrf hook | #4 | DONE |
+| WCAG 2.1 AA accessibility audit | #5 | DONE |
+| 30 new E2E tests (136 total) | #6 | DONE |
+| Production PWA icons (12 PNGs) | #7 | DONE |
+| Performance: dynamic import QR, next/image avatars | #8 | DONE |
+| Fix build error: create AdminRoleContext.tsx | -- | DONE |
+
+### Standardization (February 28, 2026)
 | Item | Status |
 |------|--------|
-| Update 8 documentation files to match codebase | DONE |
-| Security headers (CSP, HSTS, etc.) in `next.config.mjs` | DONE |
-| CI/CD pipeline (`.github/workflows/ci.yml`) | DONE |
-| CHANGELOG.md | DONE |
-| PRODUCTION_ROADMAP.md | DONE |
-| TODO_QUEUE.md (this file) | DONE |
+| ONBOARDING.md, PRODUCT.md, TODO.md, .env.example, CLAUDE.md | DONE |
+
+### Documentation and Security Audit (February 26, 2026)
+| Item | Status |
+|------|--------|
+| Update 8 documentation files, security headers, CI/CD, CHANGELOG, PRODUCTION_ROADMAP, TODO_QUEUE, Zod, logger, rate limiter, CSRF, PWA icons, flags, skeletons, a11y, 78 E2E tests | DONE |
