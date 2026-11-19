@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased] - 2026-03-02
 
+### Fixed
+
+- 2026-11-19 — `AuthProvider` no longer redirects `/agency/*` to the citizen `/login`. **Why:** the client-side citizen guard ignored the separate agency auth flow (agency-token, enforced in middleware), so the public agency portal and agency login were unreachable. **Outcome:** agency E2E 9/9 on chromium. CI now also installs WebKit for the `mobile-safari` project.
+- 2026-11-19 — `npm audit fix` (non-breaking updates only) and CI runner pinned to `ubuntu-24.04`. **Why:** the `npm audit --audit-level=high` gate failed CI with 45 vulnerabilities (3 critical). **Outcome:** down to 22 (1 critical). The rest need major upgrades (Next 14→16, next-pwa, sharp) and are tracked separately, so the audit gate still fails until then.
+
 ### Added
 - **21 API route handlers** (PR #11): auth (login, register, logout), citizen (profile, documents, vehicles, health, family, work, appointments, notifications), admin (citizens CRUD, documents, analytics, activity), and public verify endpoints — all using mock data with standardized response format `{ success, data, meta }`.
 - **Server-side Zod validation** (PR #11): All mutation endpoints validate request bodies with existing Zod schemas (`loginSchema`, `registerSchema`, `updateProfileSchema`, `appointmentBookingSchema`, `issueDocumentSchema`, `updateCitizenStatusSchema`) and return 422 with Spanish error details on failure.

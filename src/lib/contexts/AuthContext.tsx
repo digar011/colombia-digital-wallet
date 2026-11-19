@@ -50,6 +50,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     if (auth.isLoading) return;
 
+    // Agency routes use their own auth flow (agency-token cookie, enforced in
+    // middleware), so citizen auth redirects must not apply to them.
+    if (pathname === '/agency' || pathname.startsWith('/agency/')) return;
+
     const onPublicRoute = isPublicRoute(pathname);
 
     if (!auth.isAuthenticated && !onPublicRoute) {
