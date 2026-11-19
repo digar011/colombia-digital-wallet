@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- 2026-11-19 — `AuthProvider` no longer redirects `/agency/*` to the citizen `/login`. **Why:** the client-side citizen guard ignored the separate agency auth flow (agency-token, enforced in middleware), so the public agency portal and agency login were unreachable. **Outcome:** agency E2E 9/9 on chromium. CI now also installs WebKit for the `mobile-safari` project.
 - 2026-11-19 — `npm audit fix` (non-breaking updates only) and CI runner pinned to `ubuntu-24.04`. **Why:** the `npm audit --audit-level=high` gate failed CI with 45 vulnerabilities (3 critical). **Outcome:** down to 22 (1 critical). The rest need major upgrades (Next 14→16, next-pwa, sharp) and are tracked separately, so the audit gate still fails until then.
 
 ### Added
